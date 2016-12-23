@@ -1,0 +1,2374 @@
+Terminals unused in grammar
+
+   _BREAK
+   _PRINT
+   _READ
+   _WHILE
+   _RETURN
+
+
+Grammar
+
+    0 $accept: Program $end
+
+    1 Program: _PROGRAM _ID ConstList _LBRACKET MethodDecl _RBRACKET
+    2        | _PROGRAM _ID ClassList _LBRACKET MethodDecl _RBRACKET
+    3        | _PROGRAM _ID VarList _LBRACKET MethodDecl _RBRACKET
+    4        | _PROGRAM _ID ConstList ClassList _LBRACKET MethodDecl _RBRACKET
+    5        | _PROGRAM _ID ConstList VarList _LBRACKET MethodDecl _RBRACKET
+    6        | _PROGRAM _ID ClassList VarList _LBRACKET MethodDecl _RBRACKET
+    7        | _PROGRAM _ID ConstList ClassList VarList _LBRACKET MethodDecl _RBRACKET
+
+    8 ConstList: ConstDecl
+    9          | ConstList ConstDecl
+
+   10 ConstDecl: _CONST _TYPE _ID _ASSIGN ConstType ConstDeclList _SEMICOLON
+
+   11 ConstDeclList: %empty
+   12              | ConstDeclList _COMMA _ID _ASSIGN ConstType
+
+   13 ConstType: _NUMBER
+   14          | _CHAR_CONST
+   15          | _BOOL_CONST
+   16          | _STRING_CONST
+
+   17 VarList: VarDecl
+   18        | VarList VarDecl
+
+   19 LocalVarList: VarDecl
+   20             | LocalVarList VarDecl
+
+   21 VarDecl: _TYPE _ID VarDeclList _SEMICOLON
+   22        | _TYPE _ID _LSQBRACKET _RSQBRACKET VarDeclList _SEMICOLON
+
+   23 VarDeclList: %empty
+   24            | VarDeclList _COMMA _ID
+   25            | VarDeclList _COMMA _ID _LSQBRACKET _RSQBRACKET
+
+   26 ClassList: ClassDecl
+   27          | ClassList ClassDecl
+
+   28 ClassDecl: _CLASS _ID _LBRACKET LocalVarList _LBRACKET _RBRACKET _RBRACKET
+   29          | _CLASS _ID _LBRACKET LocalVarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+   30          | _CLASS _ID _EXTENDS _ID _LBRACKET LocalVarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+
+   31 MethodDeclList: MethodDecl
+   32               | MethodDeclList MethodDecl
+
+   33 MethodDecl: _TYPE _ID _LPAREN _RPAREN _LBRACKET Block _RBRACKET
+   34           | _TYPE _ID _LPAREN _RPAREN _LBRACKET _RBRACKET
+   35           | _VOID _ID _LPAREN _RPAREN _LBRACKET Block _RBRACKET
+   36           | _TYPE _ID _LPAREN _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+   37           | _TYPE _ID _LPAREN FormPars _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+   38           | _VOID _ID _LPAREN _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+   39           | _VOID _ID _LPAREN FormPars _RPAREN _LBRACKET Block _RBRACKET
+   40           | _VOID _ID _LPAREN FormPars _RPAREN _LBRACKET _RBRACKET
+
+   41 FormPars: FormPar
+   42         | FormPars _COMMA FormPar
+
+   43 FormPar: _TYPE _ID
+   44        | _TYPE _ID _LSQBRACKET _RSQBRACKET
+
+   45 Block: Statement
+   46      | Block Statement
+
+   47 Statement: Designator
+   48          | Designator _ASSIGN Expression _SEMICOLON
+   49          | Designator _LPAREN ActPars _RPAREN _SEMICOLON
+   50          | Designator _LPAREN _RPAREN _SEMICOLON
+   51          | Designator _INCREMENT _SEMICOLON
+   52          | Designator _DECREMENT _SEMICOLON
+   53          | _IF _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET
+   54          | _IF _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET _ELSE _LBRACKET Block _RBRACKET
+
+   55 ActPars: Expression
+   56        | ActPars _COMMA Expression
+
+   57 Condition: CondTerm
+   58          | Condition _OR CondTerm
+
+   59 CondTerm: CondFact
+   60         | CondTerm _AND CondFact
+
+   61 CondFact: Expression
+   62         | Expression CondFactList
+
+   63 CondFactList: Relop Expression
+   64             | CondFactList Relop Expression
+
+   65 Expression: _MINUS Term
+   66           | Term
+   67           | _MINUS Term AddopTermList
+   68           | Term AddopTermList
+
+   69 AddopTermList: Addop Term
+   70              | Addop Term AddopTermList
+
+   71 Term: Factor
+   72     | Factor MulopFactorList
+
+   73 MulopFactorList: Mulop Factor
+   74                | MulopFactorList Mulop Factor
+
+   75 Factor: Designator
+   76       | Designator _LPAREN _RPAREN
+   77       | Designator _LPAREN ActPars _RPAREN
+   78       | _NUMBER
+   79       | _CHAR_CONST
+   80       | _STRING_CONST
+   81       | _NEW _ID
+   82       | _NEW _ID _LSQBRACKET Expression _RSQBRACKET
+   83       | _LPAREN Expression _RPAREN
+
+   84 Designator: _ID
+   85           | _ID DesignatorRepeatList
+
+   86 DesignatorRepeatList: DesignatorRepeat
+   87                     | DesignatorRepeatList DesignatorRepeat
+
+   88 DesignatorRepeat: _DOT _ID
+   89                 | _LSQBRACKET Expression _RSQBRACKET
+
+   90 Relop: _RELOP
+
+   91 Addop: _PLUS
+   92      | _MINUS
+
+   93 Mulop: _TIMES
+   94      | _DIV
+   95      | _MOD
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+_PROGRAM (258) 1 2 3 4 5 6 7
+_BREAK (259)
+_CLASS (260) 28 29 30
+_CONST (261) 10
+_NEW (262) 81 82
+_PRINT (263)
+_READ (264)
+_VOID (265) 35 38 39 40
+_WHILE (266)
+_EXTENDS (267) 30
+_IF (268) 53 54
+_ELSE (269) 54
+_RETURN (270)
+_TYPE (271) 10 21 22 33 34 36 37 43 44
+_ID (272) 1 2 3 4 5 6 7 10 12 21 22 24 25 28 29 30 33 34 35 36 37 38
+    39 40 43 44 81 82 84 85 88
+_NUMBER (273) 13 78
+_CHAR_CONST (274) 14 79
+_BOOL_CONST (275) 15
+_STRING_CONST (276) 16 80
+_PLUS (277) 91
+_MINUS (278) 65 67 92
+_TIMES (279) 93
+_DIV (280) 94
+_MOD (281) 95
+_RELOP (282) 90
+_AND (283) 60
+_OR (284) 58
+_ASSIGN (285) 10 12 48
+_INCREMENT (286) 51
+_DECREMENT (287) 52
+_SEMICOLON (288) 10 21 22 48 49 50 51 52
+_COMMA (289) 12 24 25 42 56
+_DOT (290) 88
+_LPAREN (291) 33 34 35 36 37 38 39 40 49 50 53 54 76 77 83
+_RPAREN (292) 33 34 35 36 37 38 39 40 49 50 53 54 76 77 83
+_LSQBRACKET (293) 22 25 44 82 89
+_RSQBRACKET (294) 22 25 44 82 89
+_LBRACKET (295) 1 2 3 4 5 6 7 28 29 30 33 34 35 36 37 38 39 40 53 54
+_RBRACKET (296) 1 2 3 4 5 6 7 28 29 30 33 34 35 36 37 38 39 40 53 54
+
+
+Nonterminals, with rules where they appear
+
+$accept (42)
+    on left: 0
+Program (43)
+    on left: 1 2 3 4 5 6 7, on right: 0
+ConstList (44)
+    on left: 8 9, on right: 1 4 5 7 9
+ConstDecl (45)
+    on left: 10, on right: 8 9
+ConstDeclList (46)
+    on left: 11 12, on right: 10 12
+ConstType (47)
+    on left: 13 14 15 16, on right: 10 12
+VarList (48)
+    on left: 17 18, on right: 3 5 6 7 18
+LocalVarList (49)
+    on left: 19 20, on right: 20 28 29 30 36 37 38
+VarDecl (50)
+    on left: 21 22, on right: 17 18 19 20
+VarDeclList (51)
+    on left: 23 24 25, on right: 21 22 24 25
+ClassList (52)
+    on left: 26 27, on right: 2 4 6 7 27
+ClassDecl (53)
+    on left: 28 29 30, on right: 26 27
+MethodDeclList (54)
+    on left: 31 32, on right: 29 30 32
+MethodDecl (55)
+    on left: 33 34 35 36 37 38 39 40, on right: 1 2 3 4 5 6 7 31 32
+FormPars (56)
+    on left: 41 42, on right: 37 39 40 42
+FormPar (57)
+    on left: 43 44, on right: 41 42
+Block (58)
+    on left: 45 46, on right: 33 35 36 37 38 39 46 53 54
+Statement (59)
+    on left: 47 48 49 50 51 52 53 54, on right: 45 46
+ActPars (60)
+    on left: 55 56, on right: 49 56 77
+Condition (61)
+    on left: 57 58, on right: 53 54 58
+CondTerm (62)
+    on left: 59 60, on right: 57 58 60
+CondFact (63)
+    on left: 61 62, on right: 59 60
+CondFactList (64)
+    on left: 63 64, on right: 62 64
+Expression (65)
+    on left: 65 66 67 68, on right: 48 55 56 61 62 63 64 82 83 89
+AddopTermList (66)
+    on left: 69 70, on right: 67 68 70
+Term (67)
+    on left: 71 72, on right: 65 66 67 68 69 70
+MulopFactorList (68)
+    on left: 73 74, on right: 72 74
+Factor (69)
+    on left: 75 76 77 78 79 80 81 82 83, on right: 71 72 73 74
+Designator (70)
+    on left: 84 85, on right: 47 48 49 50 51 52 75 76 77
+DesignatorRepeatList (71)
+    on left: 86 87, on right: 85 87
+DesignatorRepeat (72)
+    on left: 88 89, on right: 86 87
+Relop (73)
+    on left: 90, on right: 63 64
+Addop (74)
+    on left: 91 92, on right: 69 70
+Mulop (75)
+    on left: 93 94 95, on right: 73 74
+
+
+State 0
+
+    0 $accept: . Program $end
+
+    _PROGRAM  shift, and go to state 1
+
+    Program  go to state 2
+
+
+State 1
+
+    1 Program: _PROGRAM . _ID ConstList _LBRACKET MethodDecl _RBRACKET
+    2        | _PROGRAM . _ID ClassList _LBRACKET MethodDecl _RBRACKET
+    3        | _PROGRAM . _ID VarList _LBRACKET MethodDecl _RBRACKET
+    4        | _PROGRAM . _ID ConstList ClassList _LBRACKET MethodDecl _RBRACKET
+    5        | _PROGRAM . _ID ConstList VarList _LBRACKET MethodDecl _RBRACKET
+    6        | _PROGRAM . _ID ClassList VarList _LBRACKET MethodDecl _RBRACKET
+    7        | _PROGRAM . _ID ConstList ClassList VarList _LBRACKET MethodDecl _RBRACKET
+
+    _ID  shift, and go to state 3
+
+
+State 2
+
+    0 $accept: Program . $end
+
+    $end  shift, and go to state 4
+
+
+State 3
+
+    1 Program: _PROGRAM _ID . ConstList _LBRACKET MethodDecl _RBRACKET
+    2        | _PROGRAM _ID . ClassList _LBRACKET MethodDecl _RBRACKET
+    3        | _PROGRAM _ID . VarList _LBRACKET MethodDecl _RBRACKET
+    4        | _PROGRAM _ID . ConstList ClassList _LBRACKET MethodDecl _RBRACKET
+    5        | _PROGRAM _ID . ConstList VarList _LBRACKET MethodDecl _RBRACKET
+    6        | _PROGRAM _ID . ClassList VarList _LBRACKET MethodDecl _RBRACKET
+    7        | _PROGRAM _ID . ConstList ClassList VarList _LBRACKET MethodDecl _RBRACKET
+
+    _CLASS  shift, and go to state 5
+    _CONST  shift, and go to state 6
+    _TYPE   shift, and go to state 7
+
+    ConstList  go to state 8
+    ConstDecl  go to state 9
+    VarList    go to state 10
+    VarDecl    go to state 11
+    ClassList  go to state 12
+    ClassDecl  go to state 13
+
+
+State 4
+
+    0 $accept: Program $end .
+
+    $default  accept
+
+
+State 5
+
+   28 ClassDecl: _CLASS . _ID _LBRACKET LocalVarList _LBRACKET _RBRACKET _RBRACKET
+   29          | _CLASS . _ID _LBRACKET LocalVarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+   30          | _CLASS . _ID _EXTENDS _ID _LBRACKET LocalVarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+
+    _ID  shift, and go to state 14
+
+
+State 6
+
+   10 ConstDecl: _CONST . _TYPE _ID _ASSIGN ConstType ConstDeclList _SEMICOLON
+
+    _TYPE  shift, and go to state 15
+
+
+State 7
+
+   21 VarDecl: _TYPE . _ID VarDeclList _SEMICOLON
+   22        | _TYPE . _ID _LSQBRACKET _RSQBRACKET VarDeclList _SEMICOLON
+
+    _ID  shift, and go to state 16
+
+
+State 8
+
+    1 Program: _PROGRAM _ID ConstList . _LBRACKET MethodDecl _RBRACKET
+    4        | _PROGRAM _ID ConstList . ClassList _LBRACKET MethodDecl _RBRACKET
+    5        | _PROGRAM _ID ConstList . VarList _LBRACKET MethodDecl _RBRACKET
+    7        | _PROGRAM _ID ConstList . ClassList VarList _LBRACKET MethodDecl _RBRACKET
+    9 ConstList: ConstList . ConstDecl
+
+    _CLASS     shift, and go to state 5
+    _CONST     shift, and go to state 6
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 17
+
+    ConstDecl  go to state 18
+    VarList    go to state 19
+    VarDecl    go to state 11
+    ClassList  go to state 20
+    ClassDecl  go to state 13
+
+
+State 9
+
+    8 ConstList: ConstDecl .
+
+    $default  reduce using rule 8 (ConstList)
+
+
+State 10
+
+    3 Program: _PROGRAM _ID VarList . _LBRACKET MethodDecl _RBRACKET
+   18 VarList: VarList . VarDecl
+
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 21
+
+    VarDecl  go to state 22
+
+
+State 11
+
+   17 VarList: VarDecl .
+
+    $default  reduce using rule 17 (VarList)
+
+
+State 12
+
+    2 Program: _PROGRAM _ID ClassList . _LBRACKET MethodDecl _RBRACKET
+    6        | _PROGRAM _ID ClassList . VarList _LBRACKET MethodDecl _RBRACKET
+   27 ClassList: ClassList . ClassDecl
+
+    _CLASS     shift, and go to state 5
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 23
+
+    VarList    go to state 24
+    VarDecl    go to state 11
+    ClassDecl  go to state 25
+
+
+State 13
+
+   26 ClassList: ClassDecl .
+
+    $default  reduce using rule 26 (ClassList)
+
+
+State 14
+
+   28 ClassDecl: _CLASS _ID . _LBRACKET LocalVarList _LBRACKET _RBRACKET _RBRACKET
+   29          | _CLASS _ID . _LBRACKET LocalVarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+   30          | _CLASS _ID . _EXTENDS _ID _LBRACKET LocalVarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+
+    _EXTENDS   shift, and go to state 26
+    _LBRACKET  shift, and go to state 27
+
+
+State 15
+
+   10 ConstDecl: _CONST _TYPE . _ID _ASSIGN ConstType ConstDeclList _SEMICOLON
+
+    _ID  shift, and go to state 28
+
+
+State 16
+
+   21 VarDecl: _TYPE _ID . VarDeclList _SEMICOLON
+   22        | _TYPE _ID . _LSQBRACKET _RSQBRACKET VarDeclList _SEMICOLON
+
+    _LSQBRACKET  shift, and go to state 29
+
+    $default  reduce using rule 23 (VarDeclList)
+
+    VarDeclList  go to state 30
+
+
+State 17
+
+    1 Program: _PROGRAM _ID ConstList _LBRACKET . MethodDecl _RBRACKET
+
+    _VOID  shift, and go to state 31
+    _TYPE  shift, and go to state 32
+
+    MethodDecl  go to state 33
+
+
+State 18
+
+    9 ConstList: ConstList ConstDecl .
+
+    $default  reduce using rule 9 (ConstList)
+
+
+State 19
+
+    5 Program: _PROGRAM _ID ConstList VarList . _LBRACKET MethodDecl _RBRACKET
+   18 VarList: VarList . VarDecl
+
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 34
+
+    VarDecl  go to state 22
+
+
+State 20
+
+    4 Program: _PROGRAM _ID ConstList ClassList . _LBRACKET MethodDecl _RBRACKET
+    7        | _PROGRAM _ID ConstList ClassList . VarList _LBRACKET MethodDecl _RBRACKET
+   27 ClassList: ClassList . ClassDecl
+
+    _CLASS     shift, and go to state 5
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 35
+
+    VarList    go to state 36
+    VarDecl    go to state 11
+    ClassDecl  go to state 25
+
+
+State 21
+
+    3 Program: _PROGRAM _ID VarList _LBRACKET . MethodDecl _RBRACKET
+
+    _VOID  shift, and go to state 31
+    _TYPE  shift, and go to state 32
+
+    MethodDecl  go to state 37
+
+
+State 22
+
+   18 VarList: VarList VarDecl .
+
+    $default  reduce using rule 18 (VarList)
+
+
+State 23
+
+    2 Program: _PROGRAM _ID ClassList _LBRACKET . MethodDecl _RBRACKET
+
+    _VOID  shift, and go to state 31
+    _TYPE  shift, and go to state 32
+
+    MethodDecl  go to state 38
+
+
+State 24
+
+    6 Program: _PROGRAM _ID ClassList VarList . _LBRACKET MethodDecl _RBRACKET
+   18 VarList: VarList . VarDecl
+
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 39
+
+    VarDecl  go to state 22
+
+
+State 25
+
+   27 ClassList: ClassList ClassDecl .
+
+    $default  reduce using rule 27 (ClassList)
+
+
+State 26
+
+   30 ClassDecl: _CLASS _ID _EXTENDS . _ID _LBRACKET LocalVarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+
+    _ID  shift, and go to state 40
+
+
+State 27
+
+   28 ClassDecl: _CLASS _ID _LBRACKET . LocalVarList _LBRACKET _RBRACKET _RBRACKET
+   29          | _CLASS _ID _LBRACKET . LocalVarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+
+    _TYPE  shift, and go to state 7
+
+    LocalVarList  go to state 41
+    VarDecl       go to state 42
+
+
+State 28
+
+   10 ConstDecl: _CONST _TYPE _ID . _ASSIGN ConstType ConstDeclList _SEMICOLON
+
+    _ASSIGN  shift, and go to state 43
+
+
+State 29
+
+   22 VarDecl: _TYPE _ID _LSQBRACKET . _RSQBRACKET VarDeclList _SEMICOLON
+
+    _RSQBRACKET  shift, and go to state 44
+
+
+State 30
+
+   21 VarDecl: _TYPE _ID VarDeclList . _SEMICOLON
+   24 VarDeclList: VarDeclList . _COMMA _ID
+   25            | VarDeclList . _COMMA _ID _LSQBRACKET _RSQBRACKET
+
+    _SEMICOLON  shift, and go to state 45
+    _COMMA      shift, and go to state 46
+
+
+State 31
+
+   35 MethodDecl: _VOID . _ID _LPAREN _RPAREN _LBRACKET Block _RBRACKET
+   38           | _VOID . _ID _LPAREN _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+   39           | _VOID . _ID _LPAREN FormPars _RPAREN _LBRACKET Block _RBRACKET
+   40           | _VOID . _ID _LPAREN FormPars _RPAREN _LBRACKET _RBRACKET
+
+    _ID  shift, and go to state 47
+
+
+State 32
+
+   33 MethodDecl: _TYPE . _ID _LPAREN _RPAREN _LBRACKET Block _RBRACKET
+   34           | _TYPE . _ID _LPAREN _RPAREN _LBRACKET _RBRACKET
+   36           | _TYPE . _ID _LPAREN _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+   37           | _TYPE . _ID _LPAREN FormPars _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+
+    _ID  shift, and go to state 48
+
+
+State 33
+
+    1 Program: _PROGRAM _ID ConstList _LBRACKET MethodDecl . _RBRACKET
+
+    _RBRACKET  shift, and go to state 49
+
+
+State 34
+
+    5 Program: _PROGRAM _ID ConstList VarList _LBRACKET . MethodDecl _RBRACKET
+
+    _VOID  shift, and go to state 31
+    _TYPE  shift, and go to state 32
+
+    MethodDecl  go to state 50
+
+
+State 35
+
+    4 Program: _PROGRAM _ID ConstList ClassList _LBRACKET . MethodDecl _RBRACKET
+
+    _VOID  shift, and go to state 31
+    _TYPE  shift, and go to state 32
+
+    MethodDecl  go to state 51
+
+
+State 36
+
+    7 Program: _PROGRAM _ID ConstList ClassList VarList . _LBRACKET MethodDecl _RBRACKET
+   18 VarList: VarList . VarDecl
+
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 52
+
+    VarDecl  go to state 22
+
+
+State 37
+
+    3 Program: _PROGRAM _ID VarList _LBRACKET MethodDecl . _RBRACKET
+
+    _RBRACKET  shift, and go to state 53
+
+
+State 38
+
+    2 Program: _PROGRAM _ID ClassList _LBRACKET MethodDecl . _RBRACKET
+
+    _RBRACKET  shift, and go to state 54
+
+
+State 39
+
+    6 Program: _PROGRAM _ID ClassList VarList _LBRACKET . MethodDecl _RBRACKET
+
+    _VOID  shift, and go to state 31
+    _TYPE  shift, and go to state 32
+
+    MethodDecl  go to state 55
+
+
+State 40
+
+   30 ClassDecl: _CLASS _ID _EXTENDS _ID . _LBRACKET LocalVarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+
+    _LBRACKET  shift, and go to state 56
+
+
+State 41
+
+   20 LocalVarList: LocalVarList . VarDecl
+   28 ClassDecl: _CLASS _ID _LBRACKET LocalVarList . _LBRACKET _RBRACKET _RBRACKET
+   29          | _CLASS _ID _LBRACKET LocalVarList . _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 57
+
+    VarDecl  go to state 58
+
+
+State 42
+
+   19 LocalVarList: VarDecl .
+
+    $default  reduce using rule 19 (LocalVarList)
+
+
+State 43
+
+   10 ConstDecl: _CONST _TYPE _ID _ASSIGN . ConstType ConstDeclList _SEMICOLON
+
+    _NUMBER        shift, and go to state 59
+    _CHAR_CONST    shift, and go to state 60
+    _BOOL_CONST    shift, and go to state 61
+    _STRING_CONST  shift, and go to state 62
+
+    ConstType  go to state 63
+
+
+State 44
+
+   22 VarDecl: _TYPE _ID _LSQBRACKET _RSQBRACKET . VarDeclList _SEMICOLON
+
+    $default  reduce using rule 23 (VarDeclList)
+
+    VarDeclList  go to state 64
+
+
+State 45
+
+   21 VarDecl: _TYPE _ID VarDeclList _SEMICOLON .
+
+    $default  reduce using rule 21 (VarDecl)
+
+
+State 46
+
+   24 VarDeclList: VarDeclList _COMMA . _ID
+   25            | VarDeclList _COMMA . _ID _LSQBRACKET _RSQBRACKET
+
+    _ID  shift, and go to state 65
+
+
+State 47
+
+   35 MethodDecl: _VOID _ID . _LPAREN _RPAREN _LBRACKET Block _RBRACKET
+   38           | _VOID _ID . _LPAREN _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+   39           | _VOID _ID . _LPAREN FormPars _RPAREN _LBRACKET Block _RBRACKET
+   40           | _VOID _ID . _LPAREN FormPars _RPAREN _LBRACKET _RBRACKET
+
+    _LPAREN  shift, and go to state 66
+
+
+State 48
+
+   33 MethodDecl: _TYPE _ID . _LPAREN _RPAREN _LBRACKET Block _RBRACKET
+   34           | _TYPE _ID . _LPAREN _RPAREN _LBRACKET _RBRACKET
+   36           | _TYPE _ID . _LPAREN _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+   37           | _TYPE _ID . _LPAREN FormPars _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+
+    _LPAREN  shift, and go to state 67
+
+
+State 49
+
+    1 Program: _PROGRAM _ID ConstList _LBRACKET MethodDecl _RBRACKET .
+
+    $default  reduce using rule 1 (Program)
+
+
+State 50
+
+    5 Program: _PROGRAM _ID ConstList VarList _LBRACKET MethodDecl . _RBRACKET
+
+    _RBRACKET  shift, and go to state 68
+
+
+State 51
+
+    4 Program: _PROGRAM _ID ConstList ClassList _LBRACKET MethodDecl . _RBRACKET
+
+    _RBRACKET  shift, and go to state 69
+
+
+State 52
+
+    7 Program: _PROGRAM _ID ConstList ClassList VarList _LBRACKET . MethodDecl _RBRACKET
+
+    _VOID  shift, and go to state 31
+    _TYPE  shift, and go to state 32
+
+    MethodDecl  go to state 70
+
+
+State 53
+
+    3 Program: _PROGRAM _ID VarList _LBRACKET MethodDecl _RBRACKET .
+
+    $default  reduce using rule 3 (Program)
+
+
+State 54
+
+    2 Program: _PROGRAM _ID ClassList _LBRACKET MethodDecl _RBRACKET .
+
+    $default  reduce using rule 2 (Program)
+
+
+State 55
+
+    6 Program: _PROGRAM _ID ClassList VarList _LBRACKET MethodDecl . _RBRACKET
+
+    _RBRACKET  shift, and go to state 71
+
+
+State 56
+
+   30 ClassDecl: _CLASS _ID _EXTENDS _ID _LBRACKET . LocalVarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+
+    _TYPE  shift, and go to state 7
+
+    LocalVarList  go to state 72
+    VarDecl       go to state 42
+
+
+State 57
+
+   28 ClassDecl: _CLASS _ID _LBRACKET LocalVarList _LBRACKET . _RBRACKET _RBRACKET
+   29          | _CLASS _ID _LBRACKET LocalVarList _LBRACKET . MethodDeclList _RBRACKET _RBRACKET
+
+    _VOID      shift, and go to state 31
+    _TYPE      shift, and go to state 32
+    _RBRACKET  shift, and go to state 73
+
+    MethodDeclList  go to state 74
+    MethodDecl      go to state 75
+
+
+State 58
+
+   20 LocalVarList: LocalVarList VarDecl .
+
+    $default  reduce using rule 20 (LocalVarList)
+
+
+State 59
+
+   13 ConstType: _NUMBER .
+
+    $default  reduce using rule 13 (ConstType)
+
+
+State 60
+
+   14 ConstType: _CHAR_CONST .
+
+    $default  reduce using rule 14 (ConstType)
+
+
+State 61
+
+   15 ConstType: _BOOL_CONST .
+
+    $default  reduce using rule 15 (ConstType)
+
+
+State 62
+
+   16 ConstType: _STRING_CONST .
+
+    $default  reduce using rule 16 (ConstType)
+
+
+State 63
+
+   10 ConstDecl: _CONST _TYPE _ID _ASSIGN ConstType . ConstDeclList _SEMICOLON
+
+    $default  reduce using rule 11 (ConstDeclList)
+
+    ConstDeclList  go to state 76
+
+
+State 64
+
+   22 VarDecl: _TYPE _ID _LSQBRACKET _RSQBRACKET VarDeclList . _SEMICOLON
+   24 VarDeclList: VarDeclList . _COMMA _ID
+   25            | VarDeclList . _COMMA _ID _LSQBRACKET _RSQBRACKET
+
+    _SEMICOLON  shift, and go to state 77
+    _COMMA      shift, and go to state 46
+
+
+State 65
+
+   24 VarDeclList: VarDeclList _COMMA _ID .
+   25            | VarDeclList _COMMA _ID . _LSQBRACKET _RSQBRACKET
+
+    _LSQBRACKET  shift, and go to state 78
+
+    $default  reduce using rule 24 (VarDeclList)
+
+
+State 66
+
+   35 MethodDecl: _VOID _ID _LPAREN . _RPAREN _LBRACKET Block _RBRACKET
+   38           | _VOID _ID _LPAREN . _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+   39           | _VOID _ID _LPAREN . FormPars _RPAREN _LBRACKET Block _RBRACKET
+   40           | _VOID _ID _LPAREN . FormPars _RPAREN _LBRACKET _RBRACKET
+
+    _TYPE    shift, and go to state 79
+    _RPAREN  shift, and go to state 80
+
+    FormPars  go to state 81
+    FormPar   go to state 82
+
+
+State 67
+
+   33 MethodDecl: _TYPE _ID _LPAREN . _RPAREN _LBRACKET Block _RBRACKET
+   34           | _TYPE _ID _LPAREN . _RPAREN _LBRACKET _RBRACKET
+   36           | _TYPE _ID _LPAREN . _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+   37           | _TYPE _ID _LPAREN . FormPars _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+
+    _TYPE    shift, and go to state 79
+    _RPAREN  shift, and go to state 83
+
+    FormPars  go to state 84
+    FormPar   go to state 82
+
+
+State 68
+
+    5 Program: _PROGRAM _ID ConstList VarList _LBRACKET MethodDecl _RBRACKET .
+
+    $default  reduce using rule 5 (Program)
+
+
+State 69
+
+    4 Program: _PROGRAM _ID ConstList ClassList _LBRACKET MethodDecl _RBRACKET .
+
+    $default  reduce using rule 4 (Program)
+
+
+State 70
+
+    7 Program: _PROGRAM _ID ConstList ClassList VarList _LBRACKET MethodDecl . _RBRACKET
+
+    _RBRACKET  shift, and go to state 85
+
+
+State 71
+
+    6 Program: _PROGRAM _ID ClassList VarList _LBRACKET MethodDecl _RBRACKET .
+
+    $default  reduce using rule 6 (Program)
+
+
+State 72
+
+   20 LocalVarList: LocalVarList . VarDecl
+   30 ClassDecl: _CLASS _ID _EXTENDS _ID _LBRACKET LocalVarList . _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 86
+
+    VarDecl  go to state 58
+
+
+State 73
+
+   28 ClassDecl: _CLASS _ID _LBRACKET LocalVarList _LBRACKET _RBRACKET . _RBRACKET
+
+    _RBRACKET  shift, and go to state 87
+
+
+State 74
+
+   29 ClassDecl: _CLASS _ID _LBRACKET LocalVarList _LBRACKET MethodDeclList . _RBRACKET _RBRACKET
+   32 MethodDeclList: MethodDeclList . MethodDecl
+
+    _VOID      shift, and go to state 31
+    _TYPE      shift, and go to state 32
+    _RBRACKET  shift, and go to state 88
+
+    MethodDecl  go to state 89
+
+
+State 75
+
+   31 MethodDeclList: MethodDecl .
+
+    $default  reduce using rule 31 (MethodDeclList)
+
+
+State 76
+
+   10 ConstDecl: _CONST _TYPE _ID _ASSIGN ConstType ConstDeclList . _SEMICOLON
+   12 ConstDeclList: ConstDeclList . _COMMA _ID _ASSIGN ConstType
+
+    _SEMICOLON  shift, and go to state 90
+    _COMMA      shift, and go to state 91
+
+
+State 77
+
+   22 VarDecl: _TYPE _ID _LSQBRACKET _RSQBRACKET VarDeclList _SEMICOLON .
+
+    $default  reduce using rule 22 (VarDecl)
+
+
+State 78
+
+   25 VarDeclList: VarDeclList _COMMA _ID _LSQBRACKET . _RSQBRACKET
+
+    _RSQBRACKET  shift, and go to state 92
+
+
+State 79
+
+   43 FormPar: _TYPE . _ID
+   44        | _TYPE . _ID _LSQBRACKET _RSQBRACKET
+
+    _ID  shift, and go to state 93
+
+
+State 80
+
+   35 MethodDecl: _VOID _ID _LPAREN _RPAREN . _LBRACKET Block _RBRACKET
+   38           | _VOID _ID _LPAREN _RPAREN . LocalVarList _LBRACKET Block _RBRACKET
+
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 94
+
+    LocalVarList  go to state 95
+    VarDecl       go to state 42
+
+
+State 81
+
+   39 MethodDecl: _VOID _ID _LPAREN FormPars . _RPAREN _LBRACKET Block _RBRACKET
+   40           | _VOID _ID _LPAREN FormPars . _RPAREN _LBRACKET _RBRACKET
+   42 FormPars: FormPars . _COMMA FormPar
+
+    _COMMA   shift, and go to state 96
+    _RPAREN  shift, and go to state 97
+
+
+State 82
+
+   41 FormPars: FormPar .
+
+    $default  reduce using rule 41 (FormPars)
+
+
+State 83
+
+   33 MethodDecl: _TYPE _ID _LPAREN _RPAREN . _LBRACKET Block _RBRACKET
+   34           | _TYPE _ID _LPAREN _RPAREN . _LBRACKET _RBRACKET
+   36           | _TYPE _ID _LPAREN _RPAREN . LocalVarList _LBRACKET Block _RBRACKET
+
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 98
+
+    LocalVarList  go to state 99
+    VarDecl       go to state 42
+
+
+State 84
+
+   37 MethodDecl: _TYPE _ID _LPAREN FormPars . _RPAREN LocalVarList _LBRACKET Block _RBRACKET
+   42 FormPars: FormPars . _COMMA FormPar
+
+    _COMMA   shift, and go to state 96
+    _RPAREN  shift, and go to state 100
+
+
+State 85
+
+    7 Program: _PROGRAM _ID ConstList ClassList VarList _LBRACKET MethodDecl _RBRACKET .
+
+    $default  reduce using rule 7 (Program)
+
+
+State 86
+
+   30 ClassDecl: _CLASS _ID _EXTENDS _ID _LBRACKET LocalVarList _LBRACKET . MethodDeclList _RBRACKET _RBRACKET
+
+    _VOID  shift, and go to state 31
+    _TYPE  shift, and go to state 32
+
+    MethodDeclList  go to state 101
+    MethodDecl      go to state 75
+
+
+State 87
+
+   28 ClassDecl: _CLASS _ID _LBRACKET LocalVarList _LBRACKET _RBRACKET _RBRACKET .
+
+    $default  reduce using rule 28 (ClassDecl)
+
+
+State 88
+
+   29 ClassDecl: _CLASS _ID _LBRACKET LocalVarList _LBRACKET MethodDeclList _RBRACKET . _RBRACKET
+
+    _RBRACKET  shift, and go to state 102
+
+
+State 89
+
+   32 MethodDeclList: MethodDeclList MethodDecl .
+
+    $default  reduce using rule 32 (MethodDeclList)
+
+
+State 90
+
+   10 ConstDecl: _CONST _TYPE _ID _ASSIGN ConstType ConstDeclList _SEMICOLON .
+
+    $default  reduce using rule 10 (ConstDecl)
+
+
+State 91
+
+   12 ConstDeclList: ConstDeclList _COMMA . _ID _ASSIGN ConstType
+
+    _ID  shift, and go to state 103
+
+
+State 92
+
+   25 VarDeclList: VarDeclList _COMMA _ID _LSQBRACKET _RSQBRACKET .
+
+    $default  reduce using rule 25 (VarDeclList)
+
+
+State 93
+
+   43 FormPar: _TYPE _ID .
+   44        | _TYPE _ID . _LSQBRACKET _RSQBRACKET
+
+    _LSQBRACKET  shift, and go to state 104
+
+    $default  reduce using rule 43 (FormPar)
+
+
+State 94
+
+   35 MethodDecl: _VOID _ID _LPAREN _RPAREN _LBRACKET . Block _RBRACKET
+
+    _IF  shift, and go to state 105
+    _ID  shift, and go to state 106
+
+    Block       go to state 107
+    Statement   go to state 108
+    Designator  go to state 109
+
+
+State 95
+
+   20 LocalVarList: LocalVarList . VarDecl
+   38 MethodDecl: _VOID _ID _LPAREN _RPAREN LocalVarList . _LBRACKET Block _RBRACKET
+
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 110
+
+    VarDecl  go to state 58
+
+
+State 96
+
+   42 FormPars: FormPars _COMMA . FormPar
+
+    _TYPE  shift, and go to state 79
+
+    FormPar  go to state 111
+
+
+State 97
+
+   39 MethodDecl: _VOID _ID _LPAREN FormPars _RPAREN . _LBRACKET Block _RBRACKET
+   40           | _VOID _ID _LPAREN FormPars _RPAREN . _LBRACKET _RBRACKET
+
+    _LBRACKET  shift, and go to state 112
+
+
+State 98
+
+   33 MethodDecl: _TYPE _ID _LPAREN _RPAREN _LBRACKET . Block _RBRACKET
+   34           | _TYPE _ID _LPAREN _RPAREN _LBRACKET . _RBRACKET
+
+    _IF        shift, and go to state 105
+    _ID        shift, and go to state 106
+    _RBRACKET  shift, and go to state 113
+
+    Block       go to state 114
+    Statement   go to state 108
+    Designator  go to state 109
+
+
+State 99
+
+   20 LocalVarList: LocalVarList . VarDecl
+   36 MethodDecl: _TYPE _ID _LPAREN _RPAREN LocalVarList . _LBRACKET Block _RBRACKET
+
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 115
+
+    VarDecl  go to state 58
+
+
+State 100
+
+   37 MethodDecl: _TYPE _ID _LPAREN FormPars _RPAREN . LocalVarList _LBRACKET Block _RBRACKET
+
+    _TYPE  shift, and go to state 7
+
+    LocalVarList  go to state 116
+    VarDecl       go to state 42
+
+
+State 101
+
+   30 ClassDecl: _CLASS _ID _EXTENDS _ID _LBRACKET LocalVarList _LBRACKET MethodDeclList . _RBRACKET _RBRACKET
+   32 MethodDeclList: MethodDeclList . MethodDecl
+
+    _VOID      shift, and go to state 31
+    _TYPE      shift, and go to state 32
+    _RBRACKET  shift, and go to state 117
+
+    MethodDecl  go to state 89
+
+
+State 102
+
+   29 ClassDecl: _CLASS _ID _LBRACKET LocalVarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET .
+
+    $default  reduce using rule 29 (ClassDecl)
+
+
+State 103
+
+   12 ConstDeclList: ConstDeclList _COMMA _ID . _ASSIGN ConstType
+
+    _ASSIGN  shift, and go to state 118
+
+
+State 104
+
+   44 FormPar: _TYPE _ID _LSQBRACKET . _RSQBRACKET
+
+    _RSQBRACKET  shift, and go to state 119
+
+
+State 105
+
+   53 Statement: _IF . _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET
+   54          | _IF . _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET _ELSE _LBRACKET Block _RBRACKET
+
+    _LPAREN  shift, and go to state 120
+
+
+State 106
+
+   84 Designator: _ID .
+   85           | _ID . DesignatorRepeatList
+
+    _DOT         shift, and go to state 121
+    _LSQBRACKET  shift, and go to state 122
+
+    $default  reduce using rule 84 (Designator)
+
+    DesignatorRepeatList  go to state 123
+    DesignatorRepeat      go to state 124
+
+
+State 107
+
+   35 MethodDecl: _VOID _ID _LPAREN _RPAREN _LBRACKET Block . _RBRACKET
+   46 Block: Block . Statement
+
+    _IF        shift, and go to state 105
+    _ID        shift, and go to state 106
+    _RBRACKET  shift, and go to state 125
+
+    Statement   go to state 126
+    Designator  go to state 109
+
+
+State 108
+
+   45 Block: Statement .
+
+    $default  reduce using rule 45 (Block)
+
+
+State 109
+
+   47 Statement: Designator .
+   48          | Designator . _ASSIGN Expression _SEMICOLON
+   49          | Designator . _LPAREN ActPars _RPAREN _SEMICOLON
+   50          | Designator . _LPAREN _RPAREN _SEMICOLON
+   51          | Designator . _INCREMENT _SEMICOLON
+   52          | Designator . _DECREMENT _SEMICOLON
+
+    _ASSIGN     shift, and go to state 127
+    _INCREMENT  shift, and go to state 128
+    _DECREMENT  shift, and go to state 129
+    _LPAREN     shift, and go to state 130
+
+    $default  reduce using rule 47 (Statement)
+
+
+State 110
+
+   38 MethodDecl: _VOID _ID _LPAREN _RPAREN LocalVarList _LBRACKET . Block _RBRACKET
+
+    _IF  shift, and go to state 105
+    _ID  shift, and go to state 106
+
+    Block       go to state 131
+    Statement   go to state 108
+    Designator  go to state 109
+
+
+State 111
+
+   42 FormPars: FormPars _COMMA FormPar .
+
+    $default  reduce using rule 42 (FormPars)
+
+
+State 112
+
+   39 MethodDecl: _VOID _ID _LPAREN FormPars _RPAREN _LBRACKET . Block _RBRACKET
+   40           | _VOID _ID _LPAREN FormPars _RPAREN _LBRACKET . _RBRACKET
+
+    _IF        shift, and go to state 105
+    _ID        shift, and go to state 106
+    _RBRACKET  shift, and go to state 132
+
+    Block       go to state 133
+    Statement   go to state 108
+    Designator  go to state 109
+
+
+State 113
+
+   34 MethodDecl: _TYPE _ID _LPAREN _RPAREN _LBRACKET _RBRACKET .
+
+    $default  reduce using rule 34 (MethodDecl)
+
+
+State 114
+
+   33 MethodDecl: _TYPE _ID _LPAREN _RPAREN _LBRACKET Block . _RBRACKET
+   46 Block: Block . Statement
+
+    _IF        shift, and go to state 105
+    _ID        shift, and go to state 106
+    _RBRACKET  shift, and go to state 134
+
+    Statement   go to state 126
+    Designator  go to state 109
+
+
+State 115
+
+   36 MethodDecl: _TYPE _ID _LPAREN _RPAREN LocalVarList _LBRACKET . Block _RBRACKET
+
+    _IF  shift, and go to state 105
+    _ID  shift, and go to state 106
+
+    Block       go to state 135
+    Statement   go to state 108
+    Designator  go to state 109
+
+
+State 116
+
+   20 LocalVarList: LocalVarList . VarDecl
+   37 MethodDecl: _TYPE _ID _LPAREN FormPars _RPAREN LocalVarList . _LBRACKET Block _RBRACKET
+
+    _TYPE      shift, and go to state 7
+    _LBRACKET  shift, and go to state 136
+
+    VarDecl  go to state 58
+
+
+State 117
+
+   30 ClassDecl: _CLASS _ID _EXTENDS _ID _LBRACKET LocalVarList _LBRACKET MethodDeclList _RBRACKET . _RBRACKET
+
+    _RBRACKET  shift, and go to state 137
+
+
+State 118
+
+   12 ConstDeclList: ConstDeclList _COMMA _ID _ASSIGN . ConstType
+
+    _NUMBER        shift, and go to state 59
+    _CHAR_CONST    shift, and go to state 60
+    _BOOL_CONST    shift, and go to state 61
+    _STRING_CONST  shift, and go to state 62
+
+    ConstType  go to state 138
+
+
+State 119
+
+   44 FormPar: _TYPE _ID _LSQBRACKET _RSQBRACKET .
+
+    $default  reduce using rule 44 (FormPar)
+
+
+State 120
+
+   53 Statement: _IF _LPAREN . Condition _RPAREN _LBRACKET Block _RBRACKET
+   54          | _IF _LPAREN . Condition _RPAREN _LBRACKET Block _RBRACKET _ELSE _LBRACKET Block _RBRACKET
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _MINUS         shift, and go to state 143
+    _LPAREN        shift, and go to state 144
+
+    Condition   go to state 145
+    CondTerm    go to state 146
+    CondFact    go to state 147
+    Expression  go to state 148
+    Term        go to state 149
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 121
+
+   88 DesignatorRepeat: _DOT . _ID
+
+    _ID  shift, and go to state 152
+
+
+State 122
+
+   89 DesignatorRepeat: _LSQBRACKET . Expression _RSQBRACKET
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _MINUS         shift, and go to state 143
+    _LPAREN        shift, and go to state 144
+
+    Expression  go to state 153
+    Term        go to state 149
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 123
+
+   85 Designator: _ID DesignatorRepeatList .
+   87 DesignatorRepeatList: DesignatorRepeatList . DesignatorRepeat
+
+    _DOT         shift, and go to state 121
+    _LSQBRACKET  shift, and go to state 122
+
+    $default  reduce using rule 85 (Designator)
+
+    DesignatorRepeat  go to state 154
+
+
+State 124
+
+   86 DesignatorRepeatList: DesignatorRepeat .
+
+    $default  reduce using rule 86 (DesignatorRepeatList)
+
+
+State 125
+
+   35 MethodDecl: _VOID _ID _LPAREN _RPAREN _LBRACKET Block _RBRACKET .
+
+    $default  reduce using rule 35 (MethodDecl)
+
+
+State 126
+
+   46 Block: Block Statement .
+
+    $default  reduce using rule 46 (Block)
+
+
+State 127
+
+   48 Statement: Designator _ASSIGN . Expression _SEMICOLON
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _MINUS         shift, and go to state 143
+    _LPAREN        shift, and go to state 144
+
+    Expression  go to state 155
+    Term        go to state 149
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 128
+
+   51 Statement: Designator _INCREMENT . _SEMICOLON
+
+    _SEMICOLON  shift, and go to state 156
+
+
+State 129
+
+   52 Statement: Designator _DECREMENT . _SEMICOLON
+
+    _SEMICOLON  shift, and go to state 157
+
+
+State 130
+
+   49 Statement: Designator _LPAREN . ActPars _RPAREN _SEMICOLON
+   50          | Designator _LPAREN . _RPAREN _SEMICOLON
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _MINUS         shift, and go to state 143
+    _LPAREN        shift, and go to state 144
+    _RPAREN        shift, and go to state 158
+
+    ActPars     go to state 159
+    Expression  go to state 160
+    Term        go to state 149
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 131
+
+   38 MethodDecl: _VOID _ID _LPAREN _RPAREN LocalVarList _LBRACKET Block . _RBRACKET
+   46 Block: Block . Statement
+
+    _IF        shift, and go to state 105
+    _ID        shift, and go to state 106
+    _RBRACKET  shift, and go to state 161
+
+    Statement   go to state 126
+    Designator  go to state 109
+
+
+State 132
+
+   40 MethodDecl: _VOID _ID _LPAREN FormPars _RPAREN _LBRACKET _RBRACKET .
+
+    $default  reduce using rule 40 (MethodDecl)
+
+
+State 133
+
+   39 MethodDecl: _VOID _ID _LPAREN FormPars _RPAREN _LBRACKET Block . _RBRACKET
+   46 Block: Block . Statement
+
+    _IF        shift, and go to state 105
+    _ID        shift, and go to state 106
+    _RBRACKET  shift, and go to state 162
+
+    Statement   go to state 126
+    Designator  go to state 109
+
+
+State 134
+
+   33 MethodDecl: _TYPE _ID _LPAREN _RPAREN _LBRACKET Block _RBRACKET .
+
+    $default  reduce using rule 33 (MethodDecl)
+
+
+State 135
+
+   36 MethodDecl: _TYPE _ID _LPAREN _RPAREN LocalVarList _LBRACKET Block . _RBRACKET
+   46 Block: Block . Statement
+
+    _IF        shift, and go to state 105
+    _ID        shift, and go to state 106
+    _RBRACKET  shift, and go to state 163
+
+    Statement   go to state 126
+    Designator  go to state 109
+
+
+State 136
+
+   37 MethodDecl: _TYPE _ID _LPAREN FormPars _RPAREN LocalVarList _LBRACKET . Block _RBRACKET
+
+    _IF  shift, and go to state 105
+    _ID  shift, and go to state 106
+
+    Block       go to state 164
+    Statement   go to state 108
+    Designator  go to state 109
+
+
+State 137
+
+   30 ClassDecl: _CLASS _ID _EXTENDS _ID _LBRACKET LocalVarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET .
+
+    $default  reduce using rule 30 (ClassDecl)
+
+
+State 138
+
+   12 ConstDeclList: ConstDeclList _COMMA _ID _ASSIGN ConstType .
+
+    $default  reduce using rule 12 (ConstDeclList)
+
+
+State 139
+
+   81 Factor: _NEW . _ID
+   82       | _NEW . _ID _LSQBRACKET Expression _RSQBRACKET
+
+    _ID  shift, and go to state 165
+
+
+State 140
+
+   78 Factor: _NUMBER .
+
+    $default  reduce using rule 78 (Factor)
+
+
+State 141
+
+   79 Factor: _CHAR_CONST .
+
+    $default  reduce using rule 79 (Factor)
+
+
+State 142
+
+   80 Factor: _STRING_CONST .
+
+    $default  reduce using rule 80 (Factor)
+
+
+State 143
+
+   65 Expression: _MINUS . Term
+   67           | _MINUS . Term AddopTermList
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _LPAREN        shift, and go to state 144
+
+    Term        go to state 166
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 144
+
+   83 Factor: _LPAREN . Expression _RPAREN
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _MINUS         shift, and go to state 143
+    _LPAREN        shift, and go to state 144
+
+    Expression  go to state 167
+    Term        go to state 149
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 145
+
+   53 Statement: _IF _LPAREN Condition . _RPAREN _LBRACKET Block _RBRACKET
+   54          | _IF _LPAREN Condition . _RPAREN _LBRACKET Block _RBRACKET _ELSE _LBRACKET Block _RBRACKET
+   58 Condition: Condition . _OR CondTerm
+
+    _OR      shift, and go to state 168
+    _RPAREN  shift, and go to state 169
+
+
+State 146
+
+   57 Condition: CondTerm .
+   60 CondTerm: CondTerm . _AND CondFact
+
+    _AND  shift, and go to state 170
+
+    $default  reduce using rule 57 (Condition)
+
+
+State 147
+
+   59 CondTerm: CondFact .
+
+    $default  reduce using rule 59 (CondTerm)
+
+
+State 148
+
+   61 CondFact: Expression .
+   62         | Expression . CondFactList
+
+    _RELOP  shift, and go to state 171
+
+    $default  reduce using rule 61 (CondFact)
+
+    CondFactList  go to state 172
+    Relop         go to state 173
+
+
+State 149
+
+   66 Expression: Term .
+   68           | Term . AddopTermList
+
+    _PLUS   shift, and go to state 174
+    _MINUS  shift, and go to state 175
+
+    $default  reduce using rule 66 (Expression)
+
+    AddopTermList  go to state 176
+    Addop          go to state 177
+
+
+State 150
+
+   71 Term: Factor .
+   72     | Factor . MulopFactorList
+
+    _TIMES  shift, and go to state 178
+    _DIV    shift, and go to state 179
+    _MOD    shift, and go to state 180
+
+    $default  reduce using rule 71 (Term)
+
+    MulopFactorList  go to state 181
+    Mulop            go to state 182
+
+
+State 151
+
+   75 Factor: Designator .
+   76       | Designator . _LPAREN _RPAREN
+   77       | Designator . _LPAREN ActPars _RPAREN
+
+    _LPAREN  shift, and go to state 183
+
+    $default  reduce using rule 75 (Factor)
+
+
+State 152
+
+   88 DesignatorRepeat: _DOT _ID .
+
+    $default  reduce using rule 88 (DesignatorRepeat)
+
+
+State 153
+
+   89 DesignatorRepeat: _LSQBRACKET Expression . _RSQBRACKET
+
+    _RSQBRACKET  shift, and go to state 184
+
+
+State 154
+
+   87 DesignatorRepeatList: DesignatorRepeatList DesignatorRepeat .
+
+    $default  reduce using rule 87 (DesignatorRepeatList)
+
+
+State 155
+
+   48 Statement: Designator _ASSIGN Expression . _SEMICOLON
+
+    _SEMICOLON  shift, and go to state 185
+
+
+State 156
+
+   51 Statement: Designator _INCREMENT _SEMICOLON .
+
+    $default  reduce using rule 51 (Statement)
+
+
+State 157
+
+   52 Statement: Designator _DECREMENT _SEMICOLON .
+
+    $default  reduce using rule 52 (Statement)
+
+
+State 158
+
+   50 Statement: Designator _LPAREN _RPAREN . _SEMICOLON
+
+    _SEMICOLON  shift, and go to state 186
+
+
+State 159
+
+   49 Statement: Designator _LPAREN ActPars . _RPAREN _SEMICOLON
+   56 ActPars: ActPars . _COMMA Expression
+
+    _COMMA   shift, and go to state 187
+    _RPAREN  shift, and go to state 188
+
+
+State 160
+
+   55 ActPars: Expression .
+
+    $default  reduce using rule 55 (ActPars)
+
+
+State 161
+
+   38 MethodDecl: _VOID _ID _LPAREN _RPAREN LocalVarList _LBRACKET Block _RBRACKET .
+
+    $default  reduce using rule 38 (MethodDecl)
+
+
+State 162
+
+   39 MethodDecl: _VOID _ID _LPAREN FormPars _RPAREN _LBRACKET Block _RBRACKET .
+
+    $default  reduce using rule 39 (MethodDecl)
+
+
+State 163
+
+   36 MethodDecl: _TYPE _ID _LPAREN _RPAREN LocalVarList _LBRACKET Block _RBRACKET .
+
+    $default  reduce using rule 36 (MethodDecl)
+
+
+State 164
+
+   37 MethodDecl: _TYPE _ID _LPAREN FormPars _RPAREN LocalVarList _LBRACKET Block . _RBRACKET
+   46 Block: Block . Statement
+
+    _IF        shift, and go to state 105
+    _ID        shift, and go to state 106
+    _RBRACKET  shift, and go to state 189
+
+    Statement   go to state 126
+    Designator  go to state 109
+
+
+State 165
+
+   81 Factor: _NEW _ID .
+   82       | _NEW _ID . _LSQBRACKET Expression _RSQBRACKET
+
+    _LSQBRACKET  shift, and go to state 190
+
+    $default  reduce using rule 81 (Factor)
+
+
+State 166
+
+   65 Expression: _MINUS Term .
+   67           | _MINUS Term . AddopTermList
+
+    _PLUS   shift, and go to state 174
+    _MINUS  shift, and go to state 175
+
+    $default  reduce using rule 65 (Expression)
+
+    AddopTermList  go to state 191
+    Addop          go to state 177
+
+
+State 167
+
+   83 Factor: _LPAREN Expression . _RPAREN
+
+    _RPAREN  shift, and go to state 192
+
+
+State 168
+
+   58 Condition: Condition _OR . CondTerm
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _MINUS         shift, and go to state 143
+    _LPAREN        shift, and go to state 144
+
+    CondTerm    go to state 193
+    CondFact    go to state 147
+    Expression  go to state 148
+    Term        go to state 149
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 169
+
+   53 Statement: _IF _LPAREN Condition _RPAREN . _LBRACKET Block _RBRACKET
+   54          | _IF _LPAREN Condition _RPAREN . _LBRACKET Block _RBRACKET _ELSE _LBRACKET Block _RBRACKET
+
+    _LBRACKET  shift, and go to state 194
+
+
+State 170
+
+   60 CondTerm: CondTerm _AND . CondFact
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _MINUS         shift, and go to state 143
+    _LPAREN        shift, and go to state 144
+
+    CondFact    go to state 195
+    Expression  go to state 148
+    Term        go to state 149
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 171
+
+   90 Relop: _RELOP .
+
+    $default  reduce using rule 90 (Relop)
+
+
+State 172
+
+   62 CondFact: Expression CondFactList .
+   64 CondFactList: CondFactList . Relop Expression
+
+    _RELOP  shift, and go to state 171
+
+    $default  reduce using rule 62 (CondFact)
+
+    Relop  go to state 196
+
+
+State 173
+
+   63 CondFactList: Relop . Expression
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _MINUS         shift, and go to state 143
+    _LPAREN        shift, and go to state 144
+
+    Expression  go to state 197
+    Term        go to state 149
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 174
+
+   91 Addop: _PLUS .
+
+    $default  reduce using rule 91 (Addop)
+
+
+State 175
+
+   92 Addop: _MINUS .
+
+    $default  reduce using rule 92 (Addop)
+
+
+State 176
+
+   68 Expression: Term AddopTermList .
+
+    $default  reduce using rule 68 (Expression)
+
+
+State 177
+
+   69 AddopTermList: Addop . Term
+   70              | Addop . Term AddopTermList
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _LPAREN        shift, and go to state 144
+
+    Term        go to state 198
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 178
+
+   93 Mulop: _TIMES .
+
+    $default  reduce using rule 93 (Mulop)
+
+
+State 179
+
+   94 Mulop: _DIV .
+
+    $default  reduce using rule 94 (Mulop)
+
+
+State 180
+
+   95 Mulop: _MOD .
+
+    $default  reduce using rule 95 (Mulop)
+
+
+State 181
+
+   72 Term: Factor MulopFactorList .
+   74 MulopFactorList: MulopFactorList . Mulop Factor
+
+    _TIMES  shift, and go to state 178
+    _DIV    shift, and go to state 179
+    _MOD    shift, and go to state 180
+
+    $default  reduce using rule 72 (Term)
+
+    Mulop  go to state 199
+
+
+State 182
+
+   73 MulopFactorList: Mulop . Factor
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _LPAREN        shift, and go to state 144
+
+    Factor      go to state 200
+    Designator  go to state 151
+
+
+State 183
+
+   76 Factor: Designator _LPAREN . _RPAREN
+   77       | Designator _LPAREN . ActPars _RPAREN
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _MINUS         shift, and go to state 143
+    _LPAREN        shift, and go to state 144
+    _RPAREN        shift, and go to state 201
+
+    ActPars     go to state 202
+    Expression  go to state 160
+    Term        go to state 149
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 184
+
+   89 DesignatorRepeat: _LSQBRACKET Expression _RSQBRACKET .
+
+    $default  reduce using rule 89 (DesignatorRepeat)
+
+
+State 185
+
+   48 Statement: Designator _ASSIGN Expression _SEMICOLON .
+
+    $default  reduce using rule 48 (Statement)
+
+
+State 186
+
+   50 Statement: Designator _LPAREN _RPAREN _SEMICOLON .
+
+    $default  reduce using rule 50 (Statement)
+
+
+State 187
+
+   56 ActPars: ActPars _COMMA . Expression
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _MINUS         shift, and go to state 143
+    _LPAREN        shift, and go to state 144
+
+    Expression  go to state 203
+    Term        go to state 149
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 188
+
+   49 Statement: Designator _LPAREN ActPars _RPAREN . _SEMICOLON
+
+    _SEMICOLON  shift, and go to state 204
+
+
+State 189
+
+   37 MethodDecl: _TYPE _ID _LPAREN FormPars _RPAREN LocalVarList _LBRACKET Block _RBRACKET .
+
+    $default  reduce using rule 37 (MethodDecl)
+
+
+State 190
+
+   82 Factor: _NEW _ID _LSQBRACKET . Expression _RSQBRACKET
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _MINUS         shift, and go to state 143
+    _LPAREN        shift, and go to state 144
+
+    Expression  go to state 205
+    Term        go to state 149
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 191
+
+   67 Expression: _MINUS Term AddopTermList .
+
+    $default  reduce using rule 67 (Expression)
+
+
+State 192
+
+   83 Factor: _LPAREN Expression _RPAREN .
+
+    $default  reduce using rule 83 (Factor)
+
+
+State 193
+
+   58 Condition: Condition _OR CondTerm .
+   60 CondTerm: CondTerm . _AND CondFact
+
+    _AND  shift, and go to state 170
+
+    $default  reduce using rule 58 (Condition)
+
+
+State 194
+
+   53 Statement: _IF _LPAREN Condition _RPAREN _LBRACKET . Block _RBRACKET
+   54          | _IF _LPAREN Condition _RPAREN _LBRACKET . Block _RBRACKET _ELSE _LBRACKET Block _RBRACKET
+
+    _IF  shift, and go to state 105
+    _ID  shift, and go to state 106
+
+    Block       go to state 206
+    Statement   go to state 108
+    Designator  go to state 109
+
+
+State 195
+
+   60 CondTerm: CondTerm _AND CondFact .
+
+    $default  reduce using rule 60 (CondTerm)
+
+
+State 196
+
+   64 CondFactList: CondFactList Relop . Expression
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _MINUS         shift, and go to state 143
+    _LPAREN        shift, and go to state 144
+
+    Expression  go to state 207
+    Term        go to state 149
+    Factor      go to state 150
+    Designator  go to state 151
+
+
+State 197
+
+   63 CondFactList: Relop Expression .
+
+    $default  reduce using rule 63 (CondFactList)
+
+
+State 198
+
+   69 AddopTermList: Addop Term .
+   70              | Addop Term . AddopTermList
+
+    _PLUS   shift, and go to state 174
+    _MINUS  shift, and go to state 175
+
+    $default  reduce using rule 69 (AddopTermList)
+
+    AddopTermList  go to state 208
+    Addop          go to state 177
+
+
+State 199
+
+   74 MulopFactorList: MulopFactorList Mulop . Factor
+
+    _NEW           shift, and go to state 139
+    _ID            shift, and go to state 106
+    _NUMBER        shift, and go to state 140
+    _CHAR_CONST    shift, and go to state 141
+    _STRING_CONST  shift, and go to state 142
+    _LPAREN        shift, and go to state 144
+
+    Factor      go to state 209
+    Designator  go to state 151
+
+
+State 200
+
+   73 MulopFactorList: Mulop Factor .
+
+    $default  reduce using rule 73 (MulopFactorList)
+
+
+State 201
+
+   76 Factor: Designator _LPAREN _RPAREN .
+
+    $default  reduce using rule 76 (Factor)
+
+
+State 202
+
+   56 ActPars: ActPars . _COMMA Expression
+   77 Factor: Designator _LPAREN ActPars . _RPAREN
+
+    _COMMA   shift, and go to state 187
+    _RPAREN  shift, and go to state 210
+
+
+State 203
+
+   56 ActPars: ActPars _COMMA Expression .
+
+    $default  reduce using rule 56 (ActPars)
+
+
+State 204
+
+   49 Statement: Designator _LPAREN ActPars _RPAREN _SEMICOLON .
+
+    $default  reduce using rule 49 (Statement)
+
+
+State 205
+
+   82 Factor: _NEW _ID _LSQBRACKET Expression . _RSQBRACKET
+
+    _RSQBRACKET  shift, and go to state 211
+
+
+State 206
+
+   46 Block: Block . Statement
+   53 Statement: _IF _LPAREN Condition _RPAREN _LBRACKET Block . _RBRACKET
+   54          | _IF _LPAREN Condition _RPAREN _LBRACKET Block . _RBRACKET _ELSE _LBRACKET Block _RBRACKET
+
+    _IF        shift, and go to state 105
+    _ID        shift, and go to state 106
+    _RBRACKET  shift, and go to state 212
+
+    Statement   go to state 126
+    Designator  go to state 109
+
+
+State 207
+
+   64 CondFactList: CondFactList Relop Expression .
+
+    $default  reduce using rule 64 (CondFactList)
+
+
+State 208
+
+   70 AddopTermList: Addop Term AddopTermList .
+
+    $default  reduce using rule 70 (AddopTermList)
+
+
+State 209
+
+   74 MulopFactorList: MulopFactorList Mulop Factor .
+
+    $default  reduce using rule 74 (MulopFactorList)
+
+
+State 210
+
+   77 Factor: Designator _LPAREN ActPars _RPAREN .
+
+    $default  reduce using rule 77 (Factor)
+
+
+State 211
+
+   82 Factor: _NEW _ID _LSQBRACKET Expression _RSQBRACKET .
+
+    $default  reduce using rule 82 (Factor)
+
+
+State 212
+
+   53 Statement: _IF _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET .
+   54          | _IF _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET . _ELSE _LBRACKET Block _RBRACKET
+
+    _ELSE  shift, and go to state 213
+
+    $default  reduce using rule 53 (Statement)
+
+
+State 213
+
+   54 Statement: _IF _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET _ELSE . _LBRACKET Block _RBRACKET
+
+    _LBRACKET  shift, and go to state 214
+
+
+State 214
+
+   54 Statement: _IF _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET _ELSE _LBRACKET . Block _RBRACKET
+
+    _IF  shift, and go to state 105
+    _ID  shift, and go to state 106
+
+    Block       go to state 215
+    Statement   go to state 108
+    Designator  go to state 109
+
+
+State 215
+
+   46 Block: Block . Statement
+   54 Statement: _IF _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET _ELSE _LBRACKET Block . _RBRACKET
+
+    _IF        shift, and go to state 105
+    _ID        shift, and go to state 106
+    _RBRACKET  shift, and go to state 216
+
+    Statement   go to state 126
+    Designator  go to state 109
+
+
+State 216
+
+   54 Statement: _IF _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET _ELSE _LBRACKET Block _RBRACKET .
+
+    $default  reduce using rule 54 (Statement)
