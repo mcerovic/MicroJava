@@ -1,0 +1,8 @@
+parser.y: In function ‘yyparse’:
+parser.y:526:40: warning: passing argument 1 of ‘get_type’ makes integer from pointer without a cast [-Wint-conversion]
+                     $$ = get_type(index);
+                                        ^
+In file included from parser.y:7:0:
+symtab.h:41:10: note: expected ‘int’ but argument is of type ‘char * (*)(const char *, int)’
+ unsigned get_type(int index);
+          ^

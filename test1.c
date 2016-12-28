@@ -1,9 +1,14 @@
 program P
+
+  const int kur = 10;
+
   const int size = 10;
 
   class Table {
+
     int a;
     int pos[], neg[];
+
     {
       int a() {
         test = "stesad";
@@ -30,10 +35,13 @@ program P
             a = (a * b) + a[7 * 4];
           }
 
+        // komentar
+        return 5;
 
       }
       void getp (int a, char b) {
-        b = 4;
+        b = -4;
+        return b;
       }
       void getp (int a) { }
       void getp (int a[], int b) { }
@@ -41,15 +49,36 @@ program P
     }
   }
 
-  int val;
-  int va;
+  char x, y;
+
+  int a, b;
 {
-  void main()
+    void main()
     int x, i;
     {
-      if (x == 5) {
-        i++;
-      }
-
+        //‐‐‐‐‐‐‐‐‐‐ Initialize val
+        val = new Table;
+        val.pos = new int [size];
+        val.neg = new int [size];
+        i = +40;
+        while (i < size) {
+            val.putp(0,i);
+            val.putn(0,i);
+            i++;
+        }
+        //‐‐‐‐‐‐‐‐‐‐ Read values
+        read(x);
+        while (x > 0) {
+            if (0 <= x && x < size) {
+                val.putp(val.getp(x) + (-1));
+            }
+            else if (-size < x && x < 0) {
+                val.putn(val.getn(-x)+ 1);
+            }
+            else if (-size < x && x < 0) {
+                i--;
+            }
+        }
+        read(x);
     }
 }

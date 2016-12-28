@@ -3,8 +3,11 @@
 %{
     #include <string.h>
     #include "y.tab.h"
+    #include "defs.h"
 
     int line = 1;
+
+    extern YYSTYPE yylval;
 %}
 
 char                        [_a-zA-Z0-9]
@@ -29,20 +32,20 @@ digit                       [0-9]
 "if"                        {   return _IF;       }
 "else"                      {   return _ELSE;     }
 "return"                    {   return _RETURN;   }
-"int"                       {   return _TYPE;     }
-"bool"                      {   return _TYPE;     }
-"string"                    {   return _TYPE;     }
-"char"                      {   return _TYPE;     }
+"int"                       {   yylval = NUMBER_TYPE; return _TYPE;   }
+"bool"                      {   yylval = BOOL_TYPE; return _TYPE;     }
+"string"                    {   yylval = STRING_TYPE; return _TYPE;   }
+"char"                      {   yylval = CHAR_TYPE; return _TYPE;     }
 
-("true"|"false")                {   return _BOOL_CONST;   }
+("true"|"false")                {   yylval = (int)strdup(yytext); return _BOOL_CONST;   }
 
-{letter}({letter}|{digit}|"_")* {   return _ID;           }
+{letter}({letter}|{digit}|"_")* {   yylval = (int)strdup(yytext); return _ID;           }
 
-[+-]?{digit}({digit})*          {   return _NUMBER;       }
+{digit}({digit})*               {   yylval = (int)strdup(yytext); return _NUMBER;       }
 
-[\']{char}[\']                  {   return _CHAR_CONST;   }
+[\']{char}[\']                  {   yylval = (int)strdup(yytext); return _CHAR_CONST;   }
 
-[\"]({char})*[\"]               {   return _STRING_CONST; }
+[\"]({char})*[\"]               {   yylval = (int)strdup(yytext); return _STRING_CONST; }
 
 "+"                         {   return _PLUS;       }
 "-"                         {   return _MINUS;      }

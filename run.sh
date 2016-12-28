@@ -2,4 +2,4 @@
 
 clear
 make -f Makefile
-./a.out < test1.c
+./a.out < test2.c
