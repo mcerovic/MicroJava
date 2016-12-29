@@ -14,31 +14,64 @@
 
 typedef struct Table{
     char *name;
+    int first_empty;
     SYMBOL_ENTRY symbol_table[SYMBOL_TABLE_LENGTH];
 } Table;
 
-Table tables[MAX_TABLES];
+Table clases[MAX_TABLES];
+int number_of_classes = 0;
 SYMBOL_ENTRY symbol_table[SYMBOL_TABLE_LENGTH];
+Table tmp;
 
 int first_empty = 0;
 
-void switch_current_table_to(char *name) {
+void save_class_table(char *name) {
+    int i;
 
+    clases[number_of_classes].name = name;
+    clases[number_of_classes].first_empty = first_empty;
+
+    for (i = 0; i < SYMBOL_TABLE_LENGTH; i++) {
+        clases[number_of_classes].symbol_table[i] = symbol_table[i];
+    }
+
+    number_of_classes++;
+}
+
+void save_main_table() {
+    int i;
+
+    tmp.first_empty = first_empty;
+    for (i = 0; i < SYMBOL_TABLE_LENGTH; i++) {
+        tmp.symbol_table[i] = symbol_table[i];
+    }
+
+}
+
+void return_main_table() {
+    int i;
+
+    first_empty = tmp.first_empty;
+    for (i = 0; i < SYMBOL_TABLE_LENGTH; i++) {
+        symbol_table[i] = tmp.symbol_table[i];
+    }
+}
+
+void switch_table_to(char *name) {
     int i, k;
 
     for (i = 0; i < MAX_TABLES; i++) {
-        if (tables[i].name != NULL && strcmp(name, tables[i].name) == 0) {
+        if (clases[i].name != NULL && strcmp(name, clases[i].name) == 0) {
             k = i;
+            printf("K: %s\n", clases[i].name);
             break;
         }
     }
 
-    SYMBOL_ENTRY tmp[SYMBOL_TABLE_LENGTH];
-
+    first_empty = clases[k].first_empty;
     for (i = 0; i < SYMBOL_TABLE_LENGTH; i++) {
-        tmp[i] = tables[k].symbol_table[i];
-        tables[k].symbol_table[i] = symbol_table[i];
-        symbol_table[i] = tmp[i];
+
+        symbol_table[i] = clases[k].symbol_table[i];
     }
 
 }
@@ -140,6 +173,17 @@ unsigned get_type(int index) {
     return NO_TYPE;
 }
 
+char* get_class_type(int index) {
+    if(index > -1 && index < SYMBOL_TABLE_LENGTH)
+        return symbol_table[index].class_type;
+    return NO_TYPE;
+}
+
+void set_class_type(int index, char* class_type) {
+    if(index > -1 && index < SYMBOL_TABLE_LENGTH)
+        symbol_table[index].class_type = class_type;
+}
+
 void set_attribute(int index, int attribute) {
     if(index > -1 && index < SYMBOL_TABLE_LENGTH)
         symbol_table[index].attribute = attribute;
@@ -171,6 +215,7 @@ unsigned get_param_type(int index, unsigned number) {
     return NO_TYPE;
 }
 
+
 void set_register_type(int register_index, unsigned type) {
     if(register_index >= 0 && register_index <= FUNCTION_REGISTER)
         symbol_table[register_index].type = type;
@@ -186,7 +231,10 @@ void clear_symbols(unsigned begin_index) {
     for(i = begin_index; i < first_empty; i++) {
         if(symbol_table[i].name)
             free(symbol_table[i].name);
+        if(symbol_table[i].class_type)
+            free(symbol_table[i].class_type);
         symbol_table[i].name = 0;
+        symbol_table[i].class_type = 0;
         symbol_table[i].kind = NO_KIND;
         symbol_table[i].type = NO_TYPE;
         symbol_table[i].attribute = NO_ATTRIBUTE;
@@ -207,11 +255,12 @@ void clear_symtab(void) {
 void print_symtab(void) {
     int i,j;
     printf("\n\nSYMBOL TABLE\n");
-    printf("\n         name             kind       type attr p1 p2 p3 p4 p5");
-    printf("\n-- ---------------- ---------------- ---- ---- -- -- -- -- --");
+    printf("\n         name             class            kind       type attr p1 p2 p3 p4 p5");
+    printf("\n-- ---------------- ---------------- ---------------- ---- ---- -- -- -- -- --");
     for(i = 0; i < first_empty; i++) {
-        printf("\n%2d %-16s %16s %4d %4d ", i,
+        printf("\n%2d %-16s %-16s %16s %4d %4d ", i,
                symbol_table[i].name,
+               symbol_table[i].class_type,
                symbol_kinds[(int)(logarithm2(symbol_table[i].kind))],
                symbol_table[i].type,
                symbol_table[i].attribute);

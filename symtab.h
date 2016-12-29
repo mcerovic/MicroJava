@@ -7,11 +7,20 @@
 // Element tabele simbola
 typedef struct sym_entry {
     char *name;               // ime simbola
+    char *class_type;
     unsigned kind;            // vrsta simbola
     unsigned type;            // tip vrednosti simbola
     int attribute;            // dodatni attribut
     unsigned *param_types;    // tipovi parametara
 } SYMBOL_ENTRY;
+
+void save_class_table(char *name);
+void save_main_table();
+void return_main_table();
+void switch_table_to(char *name);
+
+char* get_class_type(int index);
+void set_class_type(int index, char* class_type);
 
 // Vraca indeks prvog sledeceg praznog elementa.
 int  get_next_empty_element(void);

@@ -17,7 +17,7 @@ enum { NO_TYPE, NUMBER_TYPE, CHAR_TYPE, BOOL_TYPE, STRING_TYPE, REFERENCE_TYPE }
 enum { NO_KIND = 0x1, WORKING_REGISTER = 0x2, GLOBAL_VAR = 0x4, FUNCTION = 0x8, PARAMETER = 0x10,
        LOCAL_VAR = 0x20, CONSTANT = 0x40, CLASS_VAR = 0x80 };
 
-static char *symbol_kinds[] = { "NONE", "WORKING_REGISTER", "GLOBAL_VAR", "FUNCTION", "PARAMETER", "LOCAL_VAR", "CONSTANT" };
+static char *symbol_kinds[] = { "NONE", "WORKING_REGISTER", "GLOBAL_VAR", "FUNCTION", "PARAMETER", "LOCAL_VAR", "CONSTANT", "CLASS" };
 
 //konstante relacionih operatora
 enum { LT, GT, LE, GE, EQ, NE };

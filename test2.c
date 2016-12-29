@@ -2,8 +2,34 @@ program P
 
 const bool kur = true;
 const int size = 10;
+
+class Table {
+
+    {
+        int a(int y)
+        int test;
+        {
+            test = "stesad";
+        }
+    }
+
+}
+
+class Table2 {
+
+    {
+        int func(int x)
+        int test;
+        {
+            test = "stesad";
+        }
+    }
+
+}
+
 int a, b;
 char x, y, m;
+Table t;
 
 {
 
@@ -12,7 +38,8 @@ char x, y, m;
     int c[];
     {
         b = 5;
-        kur_moj[b] = 4;
+        kur_moj[4] = c[4];
+        moj[4] = c[4];
         b = 5;
         b = 5;
         b = 5;
@@ -26,6 +53,7 @@ char x, y, m;
     int l, a;
     bool x, y;
     int niz[], niz2[];
+
     {
         a = 5;
         l = 2;
@@ -36,6 +64,8 @@ char x, y, m;
         niz[l + a] = a * l;
 
         l = 7;
+
+        t.a();
 
         niz2[5 * (l + l) - 33] = 5;
 
