@@ -176,7 +176,7 @@ unsigned get_type(int index) {
 char* get_class_type(int index) {
     if(index > -1 && index < SYMBOL_TABLE_LENGTH)
         return symbol_table[index].class_type;
-    return NO_TYPE;
+    return NULL;
 }
 
 void set_class_type(int index, char* class_type) {

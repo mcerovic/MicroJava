@@ -1,13 +1,14 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+/* A Bison parser, made by GNU Bison 2.3.  */
 
-/* Bison interface for Yacc-like parsers in C
+/* Skeleton interface for Bison's Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +16,9 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -30,61 +33,52 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
-/* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
-
-/* Token type.  */
+/* Tokens.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-  enum yytokentype
-  {
-    _PROGRAM = 258,
-    _BREAK = 259,
-    _CLASS = 260,
-    _CONST = 261,
-    _NEW = 262,
-    _PRINT = 263,
-    _READ = 264,
-    _VOID = 265,
-    _WHILE = 266,
-    _EXTENDS = 267,
-    _IF = 268,
-    _ELSE = 269,
-    _RETURN = 270,
-    _TYPE = 271,
-    _ID = 272,
-    _NUMBER = 273,
-    _CHAR_CONST = 274,
-    _BOOL_CONST = 275,
-    _STRING_CONST = 276,
-    _PLUS = 277,
-    _MINUS = 278,
-    _TIMES = 279,
-    _DIV = 280,
-    _MOD = 281,
-    _RELOP = 282,
-    _AND = 283,
-    _OR = 284,
-    _ASSIGN = 285,
-    _INCREMENT = 286,
-    _DECREMENT = 287,
-    _SEMICOLON = 288,
-    _COMMA = 289,
-    _DOT = 290,
-    _LPAREN = 291,
-    _RPAREN = 292,
-    _LSQBRACKET = 293,
-    _RSQBRACKET = 294,
-    _LBRACKET = 295,
-    _RBRACKET = 296
-  };
+   /* Put the tokens into the symbol table, so that GDB and other debuggers
+      know about them.  */
+   enum yytokentype {
+     _PROGRAM = 258,
+     _BREAK = 259,
+     _CLASS = 260,
+     _CONST = 261,
+     _NEW = 262,
+     _PRINT = 263,
+     _READ = 264,
+     _VOID = 265,
+     _WHILE = 266,
+     _EXTENDS = 267,
+     _IF = 268,
+     _ELSE = 269,
+     _RETURN = 270,
+     _TYPE = 271,
+     _ID = 272,
+     _NUMBER = 273,
+     _CHAR_CONST = 274,
+     _BOOL_CONST = 275,
+     _STRING_CONST = 276,
+     _PLUS = 277,
+     _MINUS = 278,
+     _TIMES = 279,
+     _DIV = 280,
+     _MOD = 281,
+     _RELOP = 282,
+     _AND = 283,
+     _OR = 284,
+     _ASSIGN = 285,
+     _INCREMENT = 286,
+     _DECREMENT = 287,
+     _SEMICOLON = 288,
+     _COMMA = 289,
+     _DOT = 290,
+     _LPAREN = 291,
+     _RPAREN = 292,
+     _LSQBRACKET = 293,
+     _RSQBRACKET = 294,
+     _LBRACKET = 295,
+     _RBRACKET = 296
+   };
 #endif
 /* Tokens.  */
 #define _PROGRAM 258
@@ -127,16 +121,15 @@ extern int yydebug;
 #define _LBRACKET 295
 #define _RBRACKET 296
 
-/* Value type.  */
+
+
+
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef int YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
+# define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
 #endif
-
 
 extern YYSTYPE yylval;
 
-int yyparse (void);
-
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */

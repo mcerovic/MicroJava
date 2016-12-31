@@ -37,7 +37,8 @@ digit                       [0-9]
 "string"                    {   yylval = STRING_TYPE; return _TYPE;   }
 "char"                      {   yylval = CHAR_TYPE; return _TYPE;     }
 
-("true"|"false")                {   yylval = (int)strdup(yytext); return _BOOL_CONST;   }
+"true"                      {   yylval = (int)strdup(yytext); return _BOOL_CONST;   }
+"false"                     {   yylval = (int)strdup(yytext); return _BOOL_CONST;   }
 
 {letter}({letter}|{digit}|"_")* {   yylval = (int)strdup(yytext); return _ID;           }
 
@@ -52,12 +53,12 @@ digit                       [0-9]
 "*"                         {   return _TIMES;      }
 "/"                         {   return _DIV;        }
 "%"                         {   return _MOD;        }
-"=="                        {   return _RELOP;      }
-"!="                        {   return _RELOP;      }
-">"                         {   return _RELOP;      }
-">="                        {   return _RELOP;      }
-"<"                         {   return _RELOP;      }
-"<="                        {   return _RELOP;      }
+"=="                        {   yylval = (int)strdup(yytext); return _RELOP;      }
+"!="                        {   yylval = (int)strdup(yytext); return _RELOP;      }
+">"                         {   yylval = (int)strdup(yytext); return _RELOP;      }
+">="                        {   yylval = (int)strdup(yytext); return _RELOP;      }
+"<"                         {   yylval = (int)strdup(yytext); return _RELOP;      }
+"<="                        {   yylval = (int)strdup(yytext); return _RELOP;      }
 "&&"                        {   return _AND;        }
 "||"                        {   return _OR;         }
 "="                         {   return _ASSIGN;     }

@@ -5,11 +5,14 @@ const int size = 10;
 
 class Table {
 
+    int x;
+    int y;
+
     {
-        int a(int y)
-        int test;
+        int findRow(int x)
+        int i;
         {
-            test = "stesad";
+            i = 10;
         }
     }
 
@@ -50,24 +53,25 @@ Table t;
     }
 
     int main(int c)
-    int l, a;
+    int a, b;
     bool x, y;
+    string str1;
     int niz[], niz2[];
 
     {
-        a = 5;
-        l = 2;
-        x = "a";
-        y = "b";
-        niz2 = new int[l];
+        a = "x";
+        x = "x";
+        y = false;
 
-        niz[l + a] = a * l;
+        if (x == "x" && a <= 5) {
+            str1 = a + 5;
+        }
 
-        l = 7;
+        niz2 = new int[5];
 
-        t.a();
+        t = new Table[5];
 
-        niz2[5 * (l + l) - 33] = 5;
+        t.findRow();
 
 
     }
