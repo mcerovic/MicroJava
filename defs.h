@@ -15,9 +15,9 @@ enum { NO_TYPE, NUMBER_TYPE, CHAR_TYPE, BOOL_TYPE, STRING_TYPE, REFERENCE_TYPE }
 
 // vrste simbola (moze ih biti maksimalno 32)
 enum { NO_KIND = 0x1, WORKING_REGISTER = 0x2, GLOBAL_VAR = 0x4, FUNCTION = 0x8, PARAMETER = 0x10,
-       LOCAL_VAR = 0x20, CONSTANT = 0x40, CLASS = 0x80, CLASS_VAR = 0x100 };
+       LOCAL_VAR = 0x20, CONSTANT = 0x40, CLASS = 0x80, CLASS_VAR = 0x100, CONST_VAR = 0x200 };
 
-static char *symbol_kinds[] = { "NONE", "WORKING_REGISTER", "GLOBAL_VAR", "FUNCTION", "PARAMETER", "LOCAL_VAR", "CONSTANT", "CLASS", "CLASS_VAR" };
+static char *symbol_kinds[] = { "NONE", "WORKING_REGISTER", "GLOBAL_VAR", "FUNCTION", "PARAMETER", "LOCAL_VAR", "CONSTANT", "CLASS", "CLASS_VAR", "CONST_VAR" };
 
 //konstante relacionih operatora
 enum { LT, GT, LE, GE, EQ, NE };

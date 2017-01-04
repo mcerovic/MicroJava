@@ -9,8 +9,8 @@
 
 
 void check_main(void);
-int  check_types(int first_index, int second_index);
-bool check_argument_type(int function_call_index, int arg_index, int arg_num);
-bool check_arguments_number(int function_call_index, int arg_num);
+int  check_types(char* call_table, int first_index, int second_index);
+bool check_argument_type(int function_call_index, char* call_table, int arg_index, int arg_num);
+bool check_arguments_number(int function_call_index, char* call_table, int arg_num);
 
 #endif

@@ -19,50 +19,28 @@
     int var_num = 0;
     int arg_num = 0;
     int par_num = 0;
-    int var_type = 0;
+
+    char* call_table = NULL;
     int function_index = -1;
     int function_call_index = -1;
 
-    int bool_return = 1;
+    char* parent_class = NULL;
+    unsigned tmp_type = NO_TYPE;
 
-    char* current_var = NULL;
+    int variable_index = -1;
 
-    int stackN = 20;
+    int while_flag = 0;
+    int return_flag = 0;
 
-    int p = 0;
-    char** stack;
+    int cond_error = 0;
+    int cond_level = 0;
 
-    void initStack() {
-        p = 0;
-        int i = 0;
-        stack = (char**)malloc(stackN * sizeof(char*));
+    int exp_error = 0;
+    int exp_level = 0;
 
-        for (i = 0; i < stackN; i++) {
-            stack[i] = (char*)malloc(sizeof(char));
-        }
-    }
+    int func_call = 0;
 
-    void push(char* name) {
-        stack[p] = name;
-        p++;
-    }
-
-    void pop() {
-        if (p > 0) {
-            p--;
-        } else {
-            p = 0;
-        }
-    }
-
-    char* top() {
-        return stack[p - 1];
-    }
-
-    int isEmpty() {
-        if (p <= 0) return 1;
-        return 0;
-    }
+    Stack* variables;
 
 %}
 
@@ -128,15 +106,15 @@ ConstDecl
     : _CONST _TYPE _ID _ASSIGN ConstType ConstDeclList _SEMICOLON
         {
             if (level == GLOBAL_LEVEL) {
-                if (lookup_id((char *)$3, CONSTANT) == -1) {
-                    int x = insert_symbol((char *)$3, CONSTANT, $2);
+                if (lookup_id((char *)$3, CONST_VAR) == -1) {
+                    int index = insert_symbol((char *)$3, CONST_VAR, $2);
 
                     if ($2 != $5) {
                         printerror("Variable and Expression type don't match\n");
                     }
 
                 } else {
-                    printerror("Duplicate declaration: %s\n", (char *)$3);
+                    printerror("Duplicate declaration of %s!\n", (char *)$3);
                 }
             }
         }
@@ -151,18 +129,22 @@ ConstType
     : _NUMBER
         {
             $$ = NUMBER_TYPE;
+            try_to_insert_constant((char*)$1, NUMBER_TYPE);
         }
     | _CHAR_CONST
         {
             $$ = CHAR_TYPE;
+            try_to_insert_constant((char*)$1, CHAR_TYPE);
         }
     | _BOOL_CONST
         {
             $$ = BOOL_TYPE;
+            try_to_insert_constant((char*)$1, BOOL_TYPE);
         }
     | _STRING_CONST
         {
             $$ = STRING_TYPE;
+            try_to_insert_constant((char*)$1, STRING_TYPE);
         }
     ;
 
@@ -174,138 +156,52 @@ VarList
 VarDecl
     : _TYPE _ID VarDeclList _SEMICOLON
         {
-            if (level == GLOBAL_LEVEL) {
+            push(variables, (char*)$2, 0);
 
-                if (lookup_id((char *)$2, GLOBAL_VAR) == -1) {
-                    insert_symbol((char *)$2, GLOBAL_VAR, $1);
-                } else {
-                    printerror("Duplicate declaration: %s\n", (char *)$2);
+            while(!isEmpty(variables)) {
+                int index = declareVariable($1, top(variables)->name, top(variables)->is_reference, NULL, level);
+                if (index == -1) {
+                    printerror("Duplicate declaration: %s\n", top(variables)->name);
                 }
-
-                while(!isEmpty()) {
-                    if (lookup_id(top(), GLOBAL_VAR) == -1) {
-                        insert_symbol(top(), GLOBAL_VAR, $1);
-                    } else {
-                        printerror("Duplicate declaration: %s\n", top());
-                    }
-                    pop();
-                }
-            } else if (level == LOCAL_LEVEL) {
-                if (lookup_id((char *)$2, LOCAL_VAR) == -1) {
-                    insert_symbol((char *)$2, LOCAL_VAR, $1);
-                } else {
-                    printerror("Duplicate declaration: %s\n", (char *)$2);
-                }
-
-                while(!isEmpty()) {
-                    if (lookup_id(top(), LOCAL_VAR) == -1) {
-                        insert_symbol(top(), LOCAL_VAR, $1);
-                    } else {
-                        printerror("Duplicate declaration: %s\n", top());
-                    }
-                    pop();
-                }
-            } else if (level == CLASS_LEVEL) {
-                if (lookup_id((char *)$2, CLASS_VAR) == -1) {
-                    insert_symbol((char *)$2, CLASS_VAR, $1);
-                } else {
-                    printerror("Duplicate declaration: %s\n", (char *)$2);
-                }
-
-                while(!isEmpty()) {
-                    if (lookup_id(top(), CLASS_VAR) == -1) {
-                        insert_symbol(top(), CLASS_VAR, $1);
-                    } else {
-                        printerror("Duplicate declaration: %s\n", top());
-                    }
-                    pop();
-                }
+                pop(variables);
             }
-            // // print_symtab();
+
         }
     | _TYPE _ID _LSQBRACKET _RSQBRACKET VarDeclList _SEMICOLON
         {
-            if (level == GLOBAL_LEVEL) {
+            push(variables, (char*)$2, 1);
 
-                if (lookup_id((char *)$2, GLOBAL_VAR) == -1) {
-                    int index = insert_symbol((char *)$2, GLOBAL_VAR, $1);
-                    set_param_type(index, 1, REFERENCE_TYPE);
-                } else {
-                    printerror("Duplicate declaration: %s\n", (char *)$2);
+            while(!isEmpty(variables)) {
+                int index = declareVariable($1, top(variables)->name, top(variables)->is_reference, NULL, level);
+                if (index == -1) {
+                    printerror("Duplicate declaration: %s\n", top(variables)->name);
                 }
-
-                while(!isEmpty()) {
-                    if (lookup_id(top(), GLOBAL_VAR) == -1) {
-                        int index = insert_symbol(top(), GLOBAL_VAR, $1);
-                        set_param_type(index, 1, REFERENCE_TYPE);
-                    } else {
-                        printerror("Duplicate declaration: %s\n", top());
-                    }
-                    pop();
-                }
-            } else if (level == LOCAL_LEVEL) {
-                if (lookup_id((char *)$2, LOCAL_VAR) == -1) {
-                    int index = insert_symbol((char *)$2, LOCAL_VAR, $1);
-                    set_param_type(index, 1, REFERENCE_TYPE);
-                } else {
-                    printerror("Duplicate declaration: %s\n", (char *)$2);
-                }
-
-                while(!isEmpty()) {
-                    if (lookup_id(top(), LOCAL_VAR) == -1) {
-                        int index = insert_symbol(top(), LOCAL_VAR, $1);
-                        set_param_type(index, 1, REFERENCE_TYPE);
-                    } else {
-                        printerror("Duplicate declaration: %s\n", top());
-                    }
-                    pop();
-                }
-            } else if (level == CLASS_LEVEL) {
-                if (lookup_id((char *)$2, CLASS_VAR) == -1) {
-                    int index = insert_symbol((char *)$2, CLASS_VAR, $1);
-                    set_param_type(index, 1, REFERENCE_TYPE);
-                } else {
-                    printerror("Duplicate declaration: %s\n", (char *)$2);
-                }
-
-                while(!isEmpty()) {
-                    if (lookup_id(top(), CLASS_VAR) == -1) {
-                        int index = insert_symbol(top(), CLASS_VAR, $1);
-                        set_param_type(index, 1, REFERENCE_TYPE);
-                    } else {
-                        printerror("Duplicate declaration: %s\n", top());
-                    }
-                    pop();
-                }
+                pop(variables);
             }
-            // // print_symtab();
         }
     | _ID _ID VarDeclList _SEMICOLON
         {
-            if (level == GLOBAL_LEVEL) {
+            push(variables, (char*)$2, 1);
 
-                if (lookup_id((char *)$2, GLOBAL_VAR) == -1) {
-                    int index = insert_symbol((char *)$2, GLOBAL_VAR, REFERENCE_TYPE);
-                    set_class_type(index, (char*)$1);
-                    set_param_type(index, 1, REFERENCE_TYPE);
-                } else {
-                    printerror("Duplicate declaration: %s\n", (char *)$2);
+            while(!isEmpty(variables)) {
+                int index = declareVariable(REFERENCE_TYPE, top(variables)->name, 1, (char*)$1, level);
+                if (index == -1) {
+                    printerror("Duplicate declaration: %s\n", top(variables)->name);
                 }
-
-                while(!isEmpty()) {
-                    if (lookup_id(top(), GLOBAL_VAR) == -1) {
-                        int index = insert_symbol(top(), GLOBAL_VAR, REFERENCE_TYPE);
-                        set_class_type(index, (char*)$1);
-                        set_param_type(index, 1, REFERENCE_TYPE);
-                    } else {
-                        printerror("Duplicate declaration: %s\n", top());
-                    }
-                    pop();
-                }
+                pop(variables);
             }
+        }
+    | _ID _ID _LSQBRACKET _RSQBRACKET VarDeclList _SEMICOLON
+        {
+            push(variables, (char*)$2, 1);
 
-            print_symtab();
-
+            while(!isEmpty(variables)) {
+                int index = declareVariable(REFERENCE_TYPE, top(variables)->name, 1, (char*)$1, level);
+                if (index == -1) {
+                    printerror("Duplicate declaration: %s\n", top(variables)->name);
+                }
+                pop(variables);
+            }
         }
     ;
 
@@ -313,11 +209,11 @@ VarDeclList
     :
     | _COMMA _ID VarDeclList
         {
-            push((char *)$2);
+            push(variables, (char*)$2, 0);
         }
     | _COMMA _ID _LSQBRACKET _RSQBRACKET VarDeclList
         {
-            push((char *)$2);
+            push(variables, (char*)$2, 1);
         }
     ;
 
@@ -329,30 +225,34 @@ ClassList
 ClassDecl
     : _CLASS _ID
         {
-            if (lookup_id((char*)$2, CLASS) == -1) {
-                int index = insert_symbol((char*)$2, CLASS, -1);
-                set_param_type(index, 1, REFERENCE_TYPE);
-            } else {
-                printerror("Duplicate class declaration: %s\n", top());
-            }
 
+            declareClass((char*)$2, NULL);
             save_main_table();
-
             level = CLASS_LEVEL;
-
+            parent_class = NULL;
 
         }
     _LBRACKET VarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
         {
-            print_symtab();
             save_class_table((char*)$2);
             return_main_table();
-
             level = GLOBAL_LEVEL;
-
-            print_symtab();
+            parent_class = NULL;
         }
-    | _CLASS _ID _EXTENDS _ID _LBRACKET VarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+    | _CLASS _ID _EXTENDS _ID
+        {
+            declareClass((char*)$2, (char*)$4);
+            save_main_table();
+            level = CLASS_LEVEL;
+            parent_class = (char*)$4;
+        }
+      _LBRACKET VarList _LBRACKET MethodDeclList _RBRACKET _RBRACKET
+        {
+            save_class_table((char*)$2);
+            return_main_table();
+            level = GLOBAL_LEVEL;
+            parent_class = NULL;
+        }
     ;
 
 MethodDeclList
@@ -363,15 +263,15 @@ MethodDeclList
 MethodDecl
     : _TYPE _ID
         {
-            if (lookup_id((char *)$2, GLOBAL_VAR) == -1 &&
-                lookup_id((char *)$2, FUNCTION) == -1) {
-
-                function_index = insert_symbol((char *)$2, FUNCTION, $1);
-
+            if (lookup_id((char *)$2, FUNCTION) == -1) {
+                if (lookup_id((char *)$2, GLOBAL_VAR) == -1 && lookup_id((char *)$2, CLASS_VAR) == -1) {
+                    function_index = insert_symbol((char *)$2, FUNCTION, $1);
+                } else {
+                    printerror("You are tryping to rediclare global or class variable %s to function!", (char *)$2);
+                }
             } else {
-                printerror("Duplicate parameter: %s\n", (char *)$2);
+                printerror("Duplicate function declaration: %s\n", (char *)$2);
             }
-
         }
     _LPAREN
         {
@@ -386,16 +286,47 @@ MethodDecl
         }
     VarList _LBRACKET Block _RBRACKET
         {
-            // print_symtab();
+            if (return_flag == 0) {
+                printerror("You must return some value for %s function!\n", (char*)$2);
+            }
+            return_flag = 0;
+
             if (get_last_element() > function_index)
                 clear_symbols(function_index + 1);
-            // print_symtab();
             level = GLOBAL_LEVEL;
         }
-    | _VOID _ID _LPAREN FormPars _RPAREN VarList _LBRACKET Block _RBRACKET
+    | _VOID _ID
         {
-
+            if (lookup_id((char *)$2, FUNCTION) == -1) {
+                if (lookup_id((char *)$2, GLOBAL_VAR) == -1 && lookup_id((char *)$2, CLASS_VAR) == -1) {
+                    function_index = insert_symbol((char *)$2, FUNCTION, NO_TYPE);
+                } else {
+                    printerror("You are tryping to rediclare global or class variable %s to function!", (char *)$2);
+                }
+            } else {
+                printerror("Duplicate function declaration: %s\n", (char *)$2);
+            }
+        }
+      _LPAREN
+        {
+            level = PARAMETER_LEVEL;
+            par_num = 0;
+        }
+      FormPars _RPAREN
+        {
+            set_attribute(function_index, par_num);
             level = LOCAL_LEVEL;
+            var_num = 0;
+        }
+      VarList _LBRACKET Block _RBRACKET
+        {
+            if (return_flag == 1) {
+                printerror("You can't return value from void function!\n");
+            }
+            return_flag = 0;
+
+            if (get_last_element() > function_index)
+                clear_symbols(function_index + 1);
             level = GLOBAL_LEVEL;
         }
     ;
@@ -426,14 +357,13 @@ FormPar
             if (level == PARAMETER_LEVEL) {
                 if (lookup_id((char *)$2, PARAMETER) == -1) {
                     int $$ = insert_symbol((char *)$2, PARAMETER, $1);
-                    set_param_type($$, 1, REFERENCE_TYPE);
+                    set_is_reference($$, 1);
                     par_num++;
                     set_attribute($$, par_num);
                     set_param_type(function_index, par_num, $1);
                 } else {
                     printerror("Duplicate parameter: %s\n", (char *)$2);
                 }
-
             }
         }
     ;
@@ -448,40 +378,85 @@ Statement
     | VarDecl
     | Designator _ASSIGN Expression _SEMICOLON
         {
-            printf("\n%s %d\n", (char*)$1, $3);
 
-            int globalVarIndex = lookup_id((char*)$1, GLOBAL_VAR);
-            int varIndex = lookup_id((char*)$1, LOCAL_VAR);
-            int parameterIndex = lookup_id((char*)$1, PARAMETER);
-            int varType = -1;
-
-            if (globalVarIndex != -1) {
-                varType = get_type(globalVarIndex);
-            }
-
-            if (varIndex != -1) {
-                varType = get_type(varIndex);
-            }
-
-            if (parameterIndex != -1) {
-                varType = get_type(parameterIndex);
-            }
-
-            if (varType != $3) {
-                printerror("You tried assignment of incompatible types!");
+            if ($1 != $3) {
+                printerror("Assignment of incompatible types!\n");
             }
         }
     | Designator _LPAREN ActPars _RPAREN _SEMICOLON
+        {
+            if (function_call_index == -1) {
+                printerror("Called undiclared function!\n");
+            }
+
+            check_arguments_number(function_call_index, call_table, arg_num);
+            // postavi tip povratne vrednosti funkcije u %13
+            set_register_type(FUNCTION_REGISTER, get_type(function_call_index));
+            // povratna vrednost funkcije se uvek nalazi u %13
+            $$ = FUNCTION_REGISTER;
+
+            call_table = NULL;
+            arg_num = 0;
+            function_call_index = -1;
+        }
     | Designator _LPAREN _RPAREN _SEMICOLON
+        {
+            if (function_call_index == -1) {
+                printerror("Called undiclared function!\n");
+            }
+
+            check_arguments_number(function_call_index, call_table, arg_num);
+            // postavi tip povratne vrednosti funkcije u %13
+            set_register_type(FUNCTION_REGISTER, get_type(function_call_index));
+            // povratna vrednost funkcije se uvek nalazi u %13
+            $$ = FUNCTION_REGISTER;
+
+            call_table = NULL;
+            arg_num = 0;
+            function_call_index = -1;
+        }
     | Designator _INCREMENT _SEMICOLON
+        {
+            if (variable_index == -1) {
+                printerror("Used undiclared variable!\n");
+            } else if ($1 != NUMBER_TYPE) {
+                printerror("You tried to increment non number value!\n");
+            }
+
+            variable_index = -1;
+        }
     | Designator _DECREMENT _SEMICOLON
+        {
+            if (variable_index == -1) {
+                printerror("Used undiclared variable!\n");
+            } else if ($1 != NUMBER_TYPE) {
+                printerror("You tried to decrement non number value!\n");
+            }
+
+            variable_index = -1;
+        }
     | _IF _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET
     | _IF _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET _ELSE _LBRACKET Block _RBRACKET
     | _IF _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET ElseIfList
-    | _WHILE _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET
+    | _WHILE
+        {
+            while_flag = 1;
+        }
+      _LPAREN Condition _RPAREN _LBRACKET Block _RBRACKET
+        {
+            while_flag = 0;
+        }
     | _BREAK _SEMICOLON
+        {
+            if (while_flag == 0) {
+                printerror("You can use break only in loops!\n");
+            }
+        }
     | _RETURN _SEMICOLON
     | _RETURN Expression _SEMICOLON
+        {
+            return_flag = 1;
+        }
     | _READ _LPAREN Designator _RPAREN _SEMICOLON
     | _PRINT _LPAREN Expression _RPAREN _SEMICOLON
     | _PRINT _LPAREN Expression _COMMA _NUMBER _RPAREN _SEMICOLON
@@ -494,80 +469,139 @@ ElseIfList
 
 ActPars
     : Expression
+        {
+            arg_num = 1;
+
+            check_argument_type(function_call_index, call_table, $1, arg_num);
+        }
     | ActPars _COMMA Expression
+        {
+            arg_num++;
+            check_argument_type(function_call_index, call_table, $3, arg_num);
+        }
     ;
 
 Condition
     : CondTerm
+        {
+            condError(&cond_error);
+            $$ = $1;
+        }
     | Condition _OR CondTerm
+        {
+            condError(&cond_error);
+            $$ = $3;
+        }
     ;
 
 CondTerm
     : CondFact
+        {
+            $$ = $1;
+        }
     | CondTerm _AND CondFact
+        {
+            $$ = $3;
+        }
     ;
 
 CondFact
     : Expression
+        {
+            $$ = $1;
+        }
     | Expression CondFactList
+        {
+            if ($1 != $2 && cond_error == 0) {
+                cond_error = 1;
+            }
+            $$ = $1;
+        }
     ;
 
 CondFactList
     : Relop Expression
         {
-
+            if ($2 == REFERENCE_TYPE && strcmp((char*)$1, "!=") != 0 && strcmp((char*)$1, "==") != 0 && cond_error == 0) {
+                cond_error = 2;
+            }
+            $$ = $2;
         }
     | CondFactList Relop Expression
+        {
+            if ($2 == REFERENCE_TYPE && strcmp((char*)$1, "!=") != 0 && strcmp((char*)$1, "==") != 0 && cond_error == 0) {
+                cond_error = 2;
+            }
+            if ($1 != $3 && exp_error == 0) {
+                cond_error = 1;
+            }
+            $$ = $3;
+        }
     ;
 
 Expression
     : _MINUS Term
         {
-            $$ = $2;
-            if (bool_return == 0 || $2 != NUMBER_TYPE) {
-                printerror("Expression uses incompatible types!\n");
+            if ($2 != NUMBER_TYPE && exp_error == 0) {
+                exp_error = 1;
             }
-            bool_return = 1;
+
+            if (exp_level == 0) {
+                expError(&exp_error);
+            }
+
+            $$ = $2;
         }
     | _PLUS Term
         {
-            $$ = $2;
-            if (bool_return == 0 || $2 != NUMBER_TYPE) {
-                printerror("Expression uses incompatible types!\n");
+            if ($2 != NUMBER_TYPE && exp_error == 0) {
+                exp_error = 2;
             }
-            bool_return = 1;
+
+            if (exp_level == 0) {
+                expError(&exp_error);
+            }
+            $$ = $2;
         }
     | Term
         {
-            $$ = $1;
-            if (bool_return == 0) {
-                printerror("Expression uses incompatible types!\n");
+            if (exp_level == 0) {
+                expError(&exp_error);
             }
-            bool_return = 1;
+            $$ = $1;
         }
     | _MINUS Term AddopTermList
         {
-            $$ = $2;
-            if (bool_return == 0 || $3 != NUMBER_TYPE) {
-                printerror("Expression uses incompatible types!\n");
+            if ($2 != NUMBER_TYPE && exp_error == 0) {
+                exp_error = 2;
             }
-            bool_return = 1;
+
+            if (exp_level == 0) {
+                expError(&exp_error);
+            }
+            $$ = $2;
         }
     | _PLUS Term AddopTermList
         {
-            $$ = $2;
-            if (bool_return == 0 || $3 != NUMBER_TYPE) {
-                printerror("Expression uses incompatible types!\n");
+            if ($2 != NUMBER_TYPE && exp_error == 0) {
+                exp_error = 2;
             }
-            bool_return = 1;
+
+            if (exp_level == 0) {
+                expError(&exp_error);
+            }
+            $$ = $2;
         }
     | Term AddopTermList
         {
-            $$ = $1;
-            if (bool_return == 0 || $1 != $2) {
-                printerror("Expression uses incompatible types!\n");
+            if ($1 != $2 && exp_error == 0) {
+                exp_error = 3;
             }
-            bool_return = 1;
+
+            if (exp_level == 0) {
+                expError(&exp_error);
+            }
+            $$ = $1;
         }
     ;
 
@@ -575,13 +609,12 @@ AddopTermList
     : Addop Term
         {
             if ($1 == 1) {
-                // Addop is plus
-                if ($2 != STRING_TYPE && $2 != NUMBER_TYPE) {
-                    bool_return = 0;
+                if ($2 != NUMBER_TYPE && $2 != STRING_TYPE && exp_error == 0) {
+                    exp_error = 4;
                 }
             } else {
-                if ($2 != NUMBER_TYPE) {
-                    bool_return = 0;
+                if ($2 != NUMBER_TYPE && exp_error == 0) {
+                    exp_error = 5;
                 }
             }
 
@@ -589,9 +622,19 @@ AddopTermList
         }
     | Addop Term AddopTermList
         {
-            if ($2 != $3 || $2 != NUMBER_TYPE) {
-                bool_return = 0;
+            if ($1 == 1) {
+                if ($2 != NUMBER_TYPE && $2 != STRING_TYPE && exp_error == 0) {
+                    exp_error = 4;
+                }
+            } else {
+                if ($2 != NUMBER_TYPE && exp_error == 0) {
+                    exp_error = 3;
+                }
             }
+            if ($2 != $3 && exp_error == 0) {
+                exp_error = 3;
+            }
+
             $$ = $2;
         }
     ;
@@ -603,8 +646,13 @@ Term
         }
     | Factor MulopFactorList
         {
-            if ($1 != $2) {
-                bool_return = 0;
+            if ($1 != NUMBER_TYPE && exp_error == 0) {
+
+                exp_error = 3;
+            }
+            if ($1 != $2 && exp_error == 0) {
+
+                exp_error = 3;
             }
             $$ = $1;
         }
@@ -613,117 +661,161 @@ Term
 MulopFactorList
     : Mulop Factor
         {
-            if ($2 != NUMBER_TYPE) {
-                bool_return = 0;
-            }
             $$ = $2;
         }
-    | MulopFactorList Mulop Factor
+    | Mulop Factor MulopFactorList
         {
-            if ($1 != $3 || $1 != NUMBER_TYPE) {
-                bool_return = 0;
+            if ($2 != NUMBER_TYPE && exp_error == 0) {
+                exp_error = 3;
             }
-            $$ = $1;
+            if ($2 != $3 && exp_error == 0) {
+                exp_error = 3;
+            }
+
+            $$ = $2;
         }
     ;
 
 Factor
     : Designator
         {
-
-            $$ = -1;
-
-            int globalVarIndex = lookup_id((char*)$1, GLOBAL_VAR);
-            int varIndex = lookup_id((char*)$1, LOCAL_VAR);
-            int parameterIndex = lookup_id((char*)$1, PARAMETER);
-
-            if (globalVarIndex != -1) {
-                $$ = get_type(globalVarIndex);
+            if (variable_index == -1) {
+                printerror("Used undiclared variable %s!\n", get_name(variable_index));
             }
 
-            if (varIndex != -1) {
-                $$ = get_type(varIndex);
-            }
-
-            if (parameterIndex != -1) {
-                $$ = get_type(parameterIndex);
-            }
-
-            if (globalVarIndex == -1 && varIndex == -1 &&  parameterIndex == -1) {
-                printerror("Undiclared variable: %s\n", (char *)$1);
-            }
-
+            variable_index = -1;
+            $$ = $1;
         }
     | Designator _LPAREN _RPAREN
+        {
+            if (function_call_index == -1) {
+                printerror("Called undiclared function!\n");
+            }
+
+            check_arguments_number(function_call_index, call_table, arg_num);
+            // postavi tip povratne vrednosti funkcije u %13
+            set_register_type(FUNCTION_REGISTER, get_type(function_call_index));
+            // povratna vrednost funkcije se uvek nalazi u %13
+            $$ = FUNCTION_REGISTER;
+
+            call_table = NULL;
+            function_call_index = -1;
+            arg_num = 1;
+            $$ = $1;
+        }
     | Designator _LPAREN ActPars _RPAREN
+        {
+            if (function_call_index == -1) {
+                printerror("Called undiclared function %s!\n", get_name(function_call_index));
+            }
+
+            printf("Ovde %d %s %d\n", function_call_index, call_table, arg_num);
+            check_arguments_number(function_call_index, call_table, arg_num);
+            // postavi tip povratne vrednosti funkcije u %13
+            set_register_type(FUNCTION_REGISTER, get_type(function_call_index));
+            // povratna vrednost funkcije se uvek nalazi u %13
+            $$ = FUNCTION_REGISTER;
+
+            call_table = NULL;
+            function_call_index = -1;
+            arg_num = 1;
+            $$ = $1;
+        }
     | _NUMBER
         {
             $$ = NUMBER_TYPE;
+            try_to_insert_constant((char*)$1, NUMBER_TYPE);
         }
     | _CHAR_CONST
         {
             $$ = CHAR_TYPE;
+            try_to_insert_constant((char*)$1, CHAR_TYPE);
         }
     | _BOOL_CONST
         {
             $$ = BOOL_TYPE;
+            try_to_insert_constant((char*)$1, BOOL_TYPE);
         }
     | _STRING_CONST
         {
             $$ = STRING_TYPE;
+            try_to_insert_constant((char*)$1, STRING_TYPE);
         }
     | _NEW _ID
         {
-            if (lookup_id((char*)$2, CLASS) == -1) {
-                printerror("You are tryping to create instance of undiclared class %s", (char*)$2);
-            }
+            $$ = REFERENCE_TYPE;
         }
     | _NEW _ID _LSQBRACKET Expression _RSQBRACKET
         {
             if ($4 != NUMBER_TYPE) {
-                printerror("In new %s[x] x must be integer!\n", (char*)$2);
+                printerror("Array length must be number!\n");
             }
+            $$ = REFERENCE_TYPE;
         }
     | _NEW _TYPE _LSQBRACKET Expression _RSQBRACKET
         {
             if ($4 != NUMBER_TYPE) {
-                printerror("Length of array must be number!\n");
+                printerror("Array length must be number!\n");
             }
+            $$ = REFERENCE_TYPE;
         }
-    | _LPAREN Expression _RPAREN
+    | _LPAREN
         {
-            $$ = $2;
+            exp_level++;
+        }
+      Expression _RPAREN
+        {
+            exp_level--;
+            $$ = $3;
         }
     ;
 
 Designator
     : _ID
         {
-            $$ = $1;
+            $$ = NO_TYPE;
+            int varIndex = lookUpVariable((char*)$1);
+
+            if (varIndex != -1) {
+                variable_index = varIndex;
+                if (get_is_reference(varIndex) == 1) {
+                    $$ = REFERENCE_TYPE;
+                } else {
+                    $$ = get_type(varIndex);
+                }
+            } else {
+                int funcIndex = lookUpFunction((char*)$1, parent_class, &tmp_type, &call_table);
+
+                if (funcIndex != -1) {
+                    function_call_index = funcIndex;
+                    $$ = tmp_type;
+                } else {
+                    printerror("Undiclared variable or function!\n");
+                }
+            }
+
+
         }
     | _ID
         {
-            current_var = (char*)$1;
-        }
-      DesignatorRepeatList
-        {
-            $$ = $1;
+            $$ = NO_TYPE;
+            int varIndex = lookUpVariable((char*)$1);
 
-            if ($2 == REFERENCE_TYPE) {
+            if (varIndex != -1) {
+                variable_index = varIndex;
+                if (get_is_reference(varIndex) == 1) {
+                    $$ = REFERENCE_TYPE;
 
-                int globalVarIndex = lookup_id((char*)$1, GLOBAL_VAR);
-                int varIndex = lookup_id((char*)$1, LOCAL_VAR);
-                int parameterIndex = lookup_id((char*)$1, PARAMETER);
-
-                if ((globalVarIndex == -1 || get_param_type(globalVarIndex, 1) != REFERENCE_TYPE) &&
-                    (varIndex == -1 || get_param_type(varIndex, 1) != REFERENCE_TYPE) &&
-                    (parameterIndex == -1 && get_param_type(parameterIndex, 1) != REFERENCE_TYPE)) {
-                    printerror("Used undiclared variable: %s\n", (char *)$1);
+                    parent_class = get_class_type(varIndex);
+                } else {
+                    $$ = get_type(varIndex);
                 }
-
             }
 
+
         }
+      DesignatorRepeatList
+
     ;
 
 DesignatorRepeatList
@@ -734,40 +826,39 @@ DesignatorRepeatList
 DesignatorRepeat
     : _DOT _ID
         {
-            save_main_table();
-            if (current_var != NULL) {
-                printf("%s\n", current_var);
+            $$ = NO_TYPE;
+            int varIndex = lookUpVariable((char*)$2);
 
-                int index = lookup_id(current_var, GLOBAL_VAR);
-                if (index != -1 && get_class_type(index) != NULL) {
-                    char* className =  get_class_type(index);
-                    switch_table_to(className);
+            if (varIndex != -1) {
+                variable_index = varIndex;
+                if (get_is_reference(varIndex) == 1) {
+                    $$ = REFERENCE_TYPE;
+                } else {
+                    $$ = get_type(varIndex);
+                }
+            } else {
+                int funcIndex = lookUpFunction((char*)$2, parent_class, &tmp_type, &call_table);
 
-                    int functionIndex = lookup_id((char*)$2, FUNCTION);
-                    int varIndex = lookup_id((char*)$2, CLASS_VAR);
-
-                    if (functionIndex == -1 && varIndex == -1) {
-                        printerror("Function or Variable %s is undeclared in %s class\n", (char*)$2, className);
-                    }
+                if (funcIndex != -1) {
+                    function_call_index = funcIndex;
+                    $$ = tmp_type;
+                } else {
+                    printerror("Undiclared variable or function!\n");
                 }
             }
-            return_main_table();
-            current_var = NULL;
-
         }
     | _LSQBRACKET Expression _RSQBRACKET
         {
             if ($2 != NUMBER_TYPE) {
-                printerror("Array index must be number!\n");
+                printerror("To access some array element you must pass number!\n");
             }
-            $$ = REFERENCE_TYPE;
         }
     ;
 
 Relop
     : _RELOP
         {
-            printf("Relop: %s\n", (char*)$1);
+            $$ = $1;
         }
     ;
 
@@ -802,9 +893,15 @@ void warning(char *s) {
 
 int main() {
     printf("\nSTART\n");
-    initStack();
+
     init_symtab();
+
+    variables = (Stack*)malloc(sizeof(Stack));
+    initStack(variables, 100);
+
     yyparse();
+
+    print_symtab();
 
     clear_symtab();
     printf("\nSTOP\n");
